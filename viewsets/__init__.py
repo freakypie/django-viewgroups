@@ -58,7 +58,6 @@ class ViewSetMixin(object):
                     ajax,
                     self.name)
             ]
-        print templates
         return templates
 
     def get_queryset(self):
