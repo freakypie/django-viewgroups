@@ -19,7 +19,7 @@ Import ViewSetMixin to use mixin with views that you are overriding
 
 Override default views or create your own with the viewset manager.
     
-    @driver_viewset.register("create")
+    @pizza_viewset.register("create")
     class ToppingCreateView(ViewSetMixin, CreateView):
                 
         ....
