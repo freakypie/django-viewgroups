@@ -1,0 +1,58 @@
+{% extends "base/base.html" %}
+{% load url from future %}
+
+
+{% block title %}Create {{ opts.verbose_name.title }}{% endblock title %}
+
+
+{% block header %}Create {{ opts.verbose_name.title }}{% endblock header %}
+
+{% block links %}
+    <a class="btn" href="..">Back</a>
+{% endblock links %}
+
+{% block detail %}
+<form class="form-horizontal" action="." method="post">{% csrf_token %}
+    {% block form %}
+    {% include "forms/bootstrap.html" %}
+    {% endblock form %}
+            
+    {% for inline in inlines %}
+    {{ inline }}
+    {% endfor %}
+         
+    <div class="control-group">
+        <div class="controls">
+            <button>{% block button-text %}Create {{ opts.verbose_name.title }}{% endblock button-text %}</button>
+        </div>        
+    </div>
+</form>
+{% endblock detail %}
+
+
+{% block extrastyles %}
+<link rel="stylesheet" href="/media/bootstrap/select2/select2.css" />
+{% endblock extrastyles %}
+
+
+{% block extrascripts %}
+<script src="/media/scripts/dispatch.js"></script>
+<script src="/media/bootstrap/select2/select2.js"></script>
+<script>
+
+$(function() {   
+    $("select").select2(); 
+    select2ize($(".select2-field"));    
+    $(".select2-field").select2({
+        width: "220"
+    });
+});
+// maybe later.
+//{% for inline in inlines %}
+//$('#{{ inline.opts.object_name }}-inline tbody tr').formset({
+//   prefix: '{{ inline.formset.prefix }}',
+//   formCssClass: 'dynamic-formset{{ forloop.counter }}'
+//});
+//{% endfor %}
+</script>
+{% endblock extrascripts %}

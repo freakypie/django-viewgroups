@@ -1,0 +1,11 @@
+{% extends "base/create.html" %}
+{% load url from future %}
+
+
+{% block title %}Edit: {{ object }}{% endblock title %}
+
+
+{% block header %}Edit: {{ object }}{% endblock header %}
+
+
+{% block button-text %}Save {{ opts.verbose_name.title }}{% endblock button-text %}

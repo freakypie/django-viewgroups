@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% load url from future %}
+
+{% block breadcrumbs %}
+
+{% endblock breadcrumbs %}
+
+{% block content %}
+
+<div class="links text-right">{% block links %}{% endblock links %}</div>
+<br class="clearfix" />
+
+<h2>{% block header %}{{ opts.verbose_name.title }}{% endblock header %}</h2>
+
+{% block detail %}
+No details
+{% endblock detail %}
+
+{% endblock content %}

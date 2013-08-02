@@ -1,0 +1,15 @@
+{% extends "base/base.html" %}
+{% load url from future %}
+
+
+{% block title %}{{ object|default:"Nameless" }}{% endblock title %}
+
+
+{% block header %}{{ object|default:"Nameless" }}{% endblock header %}
+
+{% block links %} 
+<a href="{% url 'base:list' %}" class="btn">View All {{ opts.verbose_name_plural.title }}</a>
+<a href="{% url 'base:update' object.pk %}" class="btn btn-info">Update</a>
+<a href="{% url 'base:delete' object.pk %}" class="btn btn-danger">Delete</a> 
+{% endblock %}
+

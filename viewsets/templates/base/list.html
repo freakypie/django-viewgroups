@@ -1,0 +1,33 @@
+{% extends "base/base.html" %}
+{% load url from future %}
+
+
+{% block header %}{{ opts.verbose_name_plural.title }}{% endblock header %}
+
+
+{% block links %}
+    <a class="btn" href="{% url 'base:create' %}">
+        <i class="icon icon-plus"></i> Create {{ opts.verbose_name.title }}
+    </a>
+{% endblock %}
+
+
+{% block detail %}
+
+    {% block list_detail %}
+        {% if object_list %}
+        <div class="object_list">{% for object in page_obj.object_list %}
+            <div class="object">
+                <a href="{% url 'base:detail' object.pk %}">{{ object }}</a>
+            </div>{% endfor %}
+        </div>
+        {% else %}
+        <div><em>Sorry, there are no {{ opts.verbose_name }} at this time.</em></div>
+        {% endif %}
+    {% endblock list_detail %}
+
+    {% with page_obj as page %}
+    {% include "misc/pagination.html" %}
+    {% endwith %}
+
+{% endblock detail %}

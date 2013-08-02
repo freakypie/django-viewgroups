@@ -1,0 +1,23 @@
+{% extends "dispatch/base/base.html" %}
+
+
+{% block title %}Delete {{ object|default:"Nameless" }}{% endblock title %}
+
+
+{% block header %}Delete {{ object|default:"Nameless" }}{% endblock header %}
+
+{% block links %} 
+<a href="{% url 'base:detail' object.pk %}" class="btn">View {{ object|default:"Nameless" }}</a> 
+<a href="{% url 'base:list' %}" class="btn">View All {{ opts.verbose_name_plural.title }}</a>
+{% endblock %}
+
+
+{% block detail %}
+
+<p>Are you sure you want to delete {{ object }}?</p>
+<form action="." method="post">{% csrf_token %}
+    <button class="btn btn-danger"><i class="icon icon-white icon-remove"></i> Yes Delete!</button>
+</form>
+<a href="{% url 'base:detail' object.pk %}" class="btn">No! I changed my mind.</a>
+
+{% endblock detail %}

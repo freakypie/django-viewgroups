@@ -34,18 +34,32 @@ class ViewSetMixin(object):
         else:
             ajax = ""
 
-        return [
-            "%s/%s/%s%s.html" % (
-                self.manager.base_template_dir,
-                self.manager.template_dir,
-                ajax,
-                self.name),
-            "%s/%s/%s%s.html" % (
-                self.manager.base_template_dir,
-                self.manager.default_app,
-                ajax,
-                self.name)
-        ]
+        if self.manager.base_template_dir:
+            templates = [
+                "%s/%s/%s%s.html" % (
+                    self.manager.base_template_dir,
+                    self.manager.template_dir,
+                    ajax,
+                    self.name),
+                "%s/%s/%s%s.html" % (
+                    self.manager.base_template_dir,
+                    self.manager.default_app,
+                    ajax,
+                    self.name)
+            ]
+        else:
+            templates = [
+                "%s/%s%s.html" % (
+                    self.manager.template_dir,
+                    ajax,
+                    self.name),
+                "%s/%s%s.html" % (
+                    self.manager.default_app,
+                    ajax,
+                    self.name)
+            ]
+        print templates
+        return templates
 
     def get_queryset(self):
         return self.manager.get_queryset(self.request)
@@ -77,8 +91,9 @@ class ViewSetDetailView(ViewSetMixin, DetailView):
 class ViewSet(object):
     name = None
     model = None
+    base_template_dir = ""
     template_dir = None
-    default_app = "views"
+    default_app = "base"
     managers = []
 
     def __init__(self, name=None, model=None, template_dir=None):
