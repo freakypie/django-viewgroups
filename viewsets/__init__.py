@@ -143,6 +143,11 @@ class ViewSet(object):
                 pass
 
             view.dispatch = self.protect(view.dispatch)
+
+            # preserve csrf setting
+            if getattr(view_class.dispatch, "csrf_exempt", False):
+                view.dispatch.__func__.csrf_exempt = True
+
             view.name = name
             view.manager = self
             view = view.as_view(**kwargs)
