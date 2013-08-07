@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='django-viewgroups',
-    version='0.0.6',
+    version='0.0.8',
     author='John Leith',
     author_email='leith.john@gmail.com',
     packages=find_packages(),
@@ -12,7 +12,6 @@ setup(
     install_requires=[
         "Django>=1.4,<=1.5",
     ],
-    package_data = {
-        '': ['*.txt', '*.rst', '*.md', '*.html'],
-    },
+    include_package_data=True,
+    zip_safe=False,
 )
