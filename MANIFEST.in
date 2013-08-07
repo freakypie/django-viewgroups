@@ -1,0 +1,2 @@
+recursive-include viewsets/templates *
+recursive-include viewgroups/templates *
