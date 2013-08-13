@@ -61,7 +61,7 @@ class ViewSetMixin(object):
         return templates
 
     def get_queryset(self):
-        return self.manager.get_queryset(self.request)
+        return self.manager.get_queryset(self, self.request, **self.kwargs)
 
 
 class ViewSetCreateView(ViewSetMixin, CreateView):
@@ -91,6 +91,8 @@ class ViewSet(object):
     name = None
     model = None
     base_template_dir = ""
+    base_url = ""
+    object_url = "(?P<pk>\d+)/"
     template_dir = None
     default_app = "base"
     managers = []
@@ -107,11 +109,14 @@ class ViewSet(object):
 
         self.name = slugify(self.name)
 
+        if not self.base_url:
+            self.base_url = "^%s/" % self.name
+
         self.views = {
             "create": (ViewSetCreateView, r'^create/$'),
-            "update": (ViewSetUpdateView, r'^(?P<pk>\d+)/update/$'),
-            "delete": (ViewSetDeleteView, r'^(?P<pk>\d+)/delete/$'),
-            "detail": (ViewSetDetailView, r'^(?P<pk>\d+)/$'),
+            "update": (ViewSetUpdateView, r'^%supdate/$' % self.object_url),
+            "delete": (ViewSetDeleteView, r'^%sdelete/$' % self.object_url),
+            "detail": (ViewSetDetailView, r'^%s$' % self.object_url),
             "list": (ViewSetListView, r'^$'),
         }
 
@@ -157,10 +162,10 @@ class ViewSet(object):
 
     @classmethod
     def all_urls(klass):
-        urls = [("^%s/" % m.name, include(m.get_urls())) for m in klass.managers]
+        urls = [(m.base_url, include(m.get_urls())) for m in klass.managers]
         return patterns('', *urls)
 
-    def get_queryset(self, request):
+    def get_queryset(self, view, request, **kwargs):
         return self.model.objects.all()
 
     def register(self, name, url=None):
@@ -170,7 +175,7 @@ class ViewSet(object):
             if name in self.views:
                 url = self.views[name][1]
             else:
-                url = r'^%s/$' % name
+                url = r'^%s/$' % (name)
 
         def inner(view):
             self.views[name] = (view, url)
@@ -179,4 +184,5 @@ class ViewSet(object):
         return inner
 
     def instance_view(self, name):
-        return self.register(name, r'^(?P<pk>\d+)/%s/$' % name)
+        return self.register(name,
+            r'^%s%s/$' % (self.object_url, name))
