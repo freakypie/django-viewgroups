@@ -1,0 +1,25 @@
+<div class="inline form-horizontal">
+    {{ inline.formset.management_form }}
+    {{ inline.formset.non_form_errors }}
+    <legend>{{ inline.opts.verbose_name_plural }}</legend>
+    <table id="{{ inline.opts.object_name }}-inline" class="table table-striped">
+        <thead>
+            <tr>{% for header in inline.get_headers %}
+                <th>{{ header }}</th>{% endfor %}
+                <th>Delete?</th>
+            </tr>
+        </thead>
+        <tbody>{% for form in inline.formset.forms %}
+            <tr>{% for field in form.visible_fields %}
+                <td>
+                    {% if forloop.counter == 1 %}
+                        {% for field in form.hidden_fields %}
+                            {{ field }}
+                        {% endfor %}
+                    {% endif %}
+                    {{ field }}
+                </td>{% endfor %}
+            </tr>{% endfor %}
+        </tbody>
+    </table>
+</div>

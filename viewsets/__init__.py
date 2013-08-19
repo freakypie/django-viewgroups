@@ -8,9 +8,14 @@ from django.core.urlresolvers import reverse
 from django.shortcuts import redirect
 from django.conf import settings
 from django.template.defaultfilters import slugify
+from django.utils.datastructures import SortedDict
 
 
 class ViewSetMixin(object):
+
+    def dispatch(self, request, *args, **kwargs):
+        self.manager.dispatch(self, request, *args, **kwargs)
+        return super(ViewSetMixin, self).dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super(ViewSetMixin, self).get_context_data(**kwargs)
@@ -97,7 +102,7 @@ class ViewSet(object):
     default_app = "base"
     managers = []
 
-    def __init__(self, name=None, model=None, template_dir=None):
+    def __init__(self, name=None, model=None, template_dir=None, exclude=[]):
 
         if model:
             self.model = model
@@ -112,13 +117,15 @@ class ViewSet(object):
         if not self.base_url:
             self.base_url = "^%s/" % self.name
 
-        self.views = {
-            "create": (ViewSetCreateView, r'^create/$'),
-            "update": (ViewSetUpdateView, r'^%supdate/$' % self.object_url),
-            "delete": (ViewSetDeleteView, r'^%sdelete/$' % self.object_url),
-            "detail": (ViewSetDetailView, r'^%s$' % self.object_url),
-            "list": (ViewSetListView, r'^$'),
-        }
+        self.views = SortedDict((
+            ("create", (ViewSetCreateView, r'^create/$')),
+            ("update", (ViewSetUpdateView, r'^%supdate/$' % self.object_url)),
+            ("delete", (ViewSetDeleteView, r'^%sdelete/$' % self.object_url)),
+            ("detail", (ViewSetDetailView, r'^%s$' % self.object_url)),
+            ("list", (ViewSetListView, r'^$')),
+        ))
+        for name in exclude:
+            del self.views[name]
 
         if template_dir:
             self.template_dir = template_dir
@@ -136,6 +143,9 @@ class ViewSet(object):
             inner.protected = True
             return inner
         return function
+
+    def dispatch(self, view, request, **kwargs):
+        pass
 
     def get_urls(self):
         urls = []

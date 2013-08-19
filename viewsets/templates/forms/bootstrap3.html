@@ -1,0 +1,48 @@
+{% load form_tags %}
+
+{% if form.non_field_errors %}
+{{ form.non_field_errors }}
+{% endif %}
+
+{% for fieldset in form|fieldsets %}
+<div class="form-horizontal form-{{ fieldset.name|default:'default'|slugify }} {{ fieldset.classes }}">
+    {% if fieldset.name %}
+    <legend>{{ fieldset.name }}</legend>
+    {% endif %}
+    
+    {% if fieldset.description %}
+    <p class="well">{{ fieldset.description|safe }}</p>
+    {% endif %}
+    
+    {% for line in fieldset %}  
+    <div class="form-group{% if line|line_has_errors %} error{% endif %} {% for fieldcont in line %}{% if fieldcont.field.is_hidden %}hide {% endif %}{% endfor %}">
+        <label class="control-label col-lg-2" for="{{ line.0.field.field.label }}">
+            {% for fieldcont in line %}{% if forloop.first and not fieldcont.field.field.widget|is_checkbox %}
+                {{ fieldcont.field.label|safe }}
+            {% endif %}{% endfor %}
+        </label>
+        <div class="col-lg-10">            
+        {% for fieldcont in line %}{% with fieldcont.field as field %}
+            <div class="{% if line|line_has_errors %}error{% endif %}" style="display: inline-block; margin-left: 1px; ">                
+                {% if field.field.widget|is_checkbox %}
+                  <label class="checkbox inline">
+                    {{ field }} {{ field.label }}
+                  </label>
+                {% else %}
+                    {{ field }}
+                {% endif %}
+                
+                {% if field.help_text %}
+                <p class="help-block">{{ field.help_text|safe }}</p>
+                {% endif %}
+                {% if field.errors %}
+                    <ul class="unstyled errorlist">{% for error in field.errors %}
+                        <li class="text-error">{{ error }}</li>{% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+        {% endwith %}{% endfor %}
+        </div>
+    </div>{% endfor %}
+</div>
+{% endfor %}
