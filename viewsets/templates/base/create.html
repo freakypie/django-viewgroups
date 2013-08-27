@@ -16,9 +16,13 @@
     {% block form %}
     {% include "forms/bootstrap.html" %}
     {% endblock form %}
-
+    
     {% for inline in inlines %}
-    {{ inline }}
+    <div class="control-group">
+        <div class="controls">
+            {{ inline }}
+        </div>
+    </div>
     {% endfor %}
          
     <div class="control-group">

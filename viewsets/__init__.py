@@ -14,12 +14,15 @@ from django.utils.datastructures import SortedDict
 class ViewSetMixin(object):
 
     def dispatch(self, request, *args, **kwargs):
-        self.manager.dispatch(self, request, *args, **kwargs)
+        if hasattr(self, "manager"):
+            retval = self.manager.pre_dispatch(request, self, *args, **kwargs)
+            if retval:
+                return retval
         return super(ViewSetMixin, self).dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super(ViewSetMixin, self).get_context_data(**kwargs)
-        context.update(dict(manager=self.manager, opts=self.manager.model._meta))
+        context.update(self.manager.extra_context(self.request, self))
         return context
 
     # need to set the current app for url namespace resolution
@@ -93,14 +96,18 @@ class ViewSetDetailView(ViewSetMixin, DetailView):
 
 
 class ViewSet(object):
+    PK_URL = "(?P<pk>\d+)/"
+    SLUG_URL = "(?P<slug>[\w\-\d]+)/"
+
     name = None
     model = None
     base_template_dir = ""
-    base_url = ""
-    object_url = "(?P<pk>\d+)/"
+    base_url = None
+    object_url = PK_URL
     template_dir = None
     default_app = "base"
     managers = []
+    exclude = []
 
     def __init__(self, name=None, model=None, template_dir=None, exclude=[]):
 
@@ -114,7 +121,7 @@ class ViewSet(object):
 
         self.name = slugify(self.name)
 
-        if not self.base_url:
+        if self.base_url is None:
             self.base_url = "^%s/" % self.name
 
         self.views = SortedDict((
@@ -124,6 +131,8 @@ class ViewSet(object):
             ("detail", (ViewSetDetailView, r'^%s$' % self.object_url)),
             ("list", (ViewSetListView, r'^$')),
         ))
+
+        exclude.extend(self.exclude)
         for name in exclude:
             del self.views[name]
 
@@ -144,7 +153,7 @@ class ViewSet(object):
             return inner
         return function
 
-    def dispatch(self, view, request, **kwargs):
+    def pre_dispatch(self, request, view, **kwargs):
         pass
 
     def get_urls(self):
@@ -196,3 +205,6 @@ class ViewSet(object):
     def instance_view(self, name):
         return self.register(name,
             r'^%s%s/$' % (self.object_url, name))
+
+    def extra_context(self, request, view, **kwargs):
+        return dict(manager=self, opts=self.model._meta, **kwargs)
