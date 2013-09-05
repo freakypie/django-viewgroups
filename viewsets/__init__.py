@@ -34,6 +34,10 @@ class ViewSetMixin(object):
             current_app=self.manager.name)
 
     def get_template_names(self):
+        template = getattr(self, "template", None)
+        if template:
+            return template
+
         if self.request.is_ajax():
             ajax = "_ajax"
         else:

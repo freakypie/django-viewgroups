@@ -21,28 +21,26 @@
                 {{ fieldcont.field.label|safe }}
             {% endif %}{% endfor %}
         </label>
-        <div class="col-lg-10">            
-        {% for fieldcont in line %}{% with fieldcont.field as field %}
-            <div class="{% if line|line_has_errors %} has-error{% endif %}" style="display: inline-block; margin-left: 1px; ">                
-                {% if field.field.widget|is_checkbox %}
-                <div class="checkbox">
-                    <label class="inline">
-                        {{ field }} {{ field.label }}
-                    </label>
-                </div>
-                {% else %}
-                    {{ field }}
-                {% endif %}
-                
-                {% if field.help_text %}
-                <p class="help-block">{{ field.help_text|safe }}</p>
-                {% endif %}
-                {% if field.errors %}
-                    <ul class="list-unstyled errorlist">{% for error in field.errors %}
-                        <li class="alert alert-danger">{{ error }}</li>{% endfor %}
-                    </ul>
-                {% endif %}
+        <div class="col-lg-10 {% if line|line_has_errors %} has-error{% endif %}">            
+        {% for fieldcont in line %}{% with fieldcont.field as field %}         
+            {% if field.field.widget|is_checkbox %}
+            <div class="checkbox">
+                <label class="inline">
+                    {{ field }} {{ field.label }}
+                </label>
             </div>
+            {% else %}
+                {{ field }}
+            {% endif %}
+            
+            {% if field.help_text %}
+            <p class="help-block">{{ field.help_text|safe }}</p>
+            {% endif %}
+            {% if field.errors %}
+                <ul class="list-unstyled errorlist">{% for error in field.errors %}
+                    <li class="alert alert-danger">{{ error }}</li>{% endfor %}
+                </ul>
+            {% endif %}
         {% endwith %}{% endfor %}
         </div>
     </div>{% endfor %}
