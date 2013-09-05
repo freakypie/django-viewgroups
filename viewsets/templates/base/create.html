@@ -12,7 +12,7 @@
 {% endblock links %}
 
 {% block detail %}
-<form class="form-horizontal" action="." method="post">{% csrf_token %}
+<form enctype="multipart/form-data" class="form-horizontal" action="." method="post">{% csrf_token %}
     {% block form %}
     {% include "forms/bootstrap.html" %}
     {% endblock form %}
@@ -27,7 +27,7 @@
          
     <div class="control-group">
         <div class="controls">
-            <button>{% block button-text %}Create {{ opts.verbose_name.title }}{% endblock button-text %}</button>
+            <button class="btn btn-primary">{% block button-text %}Create {{ opts.verbose_name.title }}{% endblock button-text %}</button>
         </div>        
     </div>
 </form>
