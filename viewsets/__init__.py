@@ -9,6 +9,7 @@ from django.shortcuts import redirect
 from django.conf import settings
 from django.template.defaultfilters import slugify
 from django.utils.datastructures import SortedDict
+from viewsets.views import AutocompleteListView
 
 
 class ViewSetMixin(object):
@@ -91,7 +92,7 @@ class ViewSetDeleteView(ViewSetMixin, DeleteView):
             current_app=self.manager.name)
 
 
-class ViewSetListView(ViewSetMixin, ListView):
+class ViewSetListView(ViewSetMixin, AutocompleteListView):
     paginate_by = 25
 
 

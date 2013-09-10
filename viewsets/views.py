@@ -1,8 +1,7 @@
 from django.db.models import Q
 from django.http import HttpResponse
 from django.views.generic.base import View
-from django.views.generic.list import MultipleObjectMixin
-from viewsets import ViewSetMixin
+from django.views.generic.list import ListView, MultipleObjectMixin
 import json
 import operator
 
@@ -62,8 +61,7 @@ class SearchMixin(object):
         )
 
 
-class AutocompleteView(ViewSetMixin, SearchMixin, MultipleObjectMixin, View):
-    paginate_by = 15
+class AutocompleteMixin(SearchMixin):
 
     def label_from_instance(self, instance):
         return u"%s" % instance
@@ -74,12 +72,30 @@ class AutocompleteView(ViewSetMixin, SearchMixin, MultipleObjectMixin, View):
             id=instance.pk
         )
 
-    def get(self, request, *args, **kwargs):
-        queryset = self.get_queryset()
-        if not hasattr(queryset, 'searched'):
-            queryset = self.perform_search(queryset)
-        page_size = self.get_paginate_by(queryset)
+    def to_json(self, queryset=None):
+        if not queryset:
+            queryset = self.get_queryset()
+            if not hasattr(queryset, 'searched'):
+                queryset = self.perform_search(queryset)
+            page_size = self.get_paginate_by(queryset)
 
-        return HttpResponse(json.dumps(
+        return json.dumps(
             [self.dict_from_instance(p) for p in queryset[:page_size]]
-        ))
+        )
+
+
+class AutocompleteView(AutocompleteMixin, MultipleObjectMixin, View):
+    paginate_by = 15
+
+    def get(self, request, *args, **kwargs):
+        return HttpResponse(self.to_json())
+
+
+class AutocompleteListView(AutocompleteMixin, ListView):
+    paginate_by = 15
+
+    def get(self, request, *args, **kwargs):
+        if request.is_ajax():
+            return HttpResponse(self.to_json())
+
+        return super(AutocompleteListView, self).get(request, *args, **kwargs)

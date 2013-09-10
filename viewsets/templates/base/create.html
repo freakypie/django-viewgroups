@@ -35,12 +35,12 @@
 
 
 {% block extrastyles %}
-<link rel="stylesheet" href="/media/bootstrap/select2/select2.css" />
+<link rel="stylesheet" href="{{ STATIC_URL }}select2/select2.css" />
 {% endblock extrastyles %}
 
 
 {% block extrascripts %}
-<script src="/media/bootstrap/select2/select2.js"></script>
+<script src="{{ STATIC_URL }}select2/select2.js"></script>
 <script src="{{ STATIC_URL }}scripts/jquery.formset.min.js"></script>
 <script>
 // {% for inline in inlines %}
