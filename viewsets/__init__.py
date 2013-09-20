@@ -192,7 +192,7 @@ class ViewSet(object):
     def get_queryset(self, view, request, **kwargs):
         return self.model.objects.all()
 
-    def register(self, name, url=None):
+    def register(self, name, url=None, ordering=0):
         """ use this to decorate your views """
 
         if not url:
@@ -203,6 +203,8 @@ class ViewSet(object):
 
         def inner(view):
             self.views[name] = (view, url)
+            self.views.keyOrder.remove(name)
+            self.views.keyOrder.insert(ordering, name)
             return view
 
         return inner
