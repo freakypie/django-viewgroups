@@ -52,24 +52,24 @@ class ViewSetMixin(object):
                 "%s/%s/%s%s.html" % (
                     self.manager.base_template_dir,
                     self.manager.template_dir,
-                    ajax,
-                    self.name),
+                    self.name,
+                    ajax),
                 "%s/%s/%s%s.html" % (
                     self.manager.base_template_dir,
                     self.manager.default_app,
-                    ajax,
-                    self.name)
+                    self.name,
+                    ajax)
             ]
         else:
             templates = [
                 "%s/%s%s.html" % (
                     self.manager.template_dir,
-                    ajax,
-                    self.name),
+                    self.name,
+                    ajax),
                 "%s/%s%s.html" % (
                     self.manager.default_app,
-                    ajax,
-                    self.name)
+                    self.name,
+                    ajax)
             ]
         return templates
 
