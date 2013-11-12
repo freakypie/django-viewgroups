@@ -10,6 +10,7 @@ from django.conf import settings
 from django.template.defaultfilters import slugify
 from django.utils.datastructures import SortedDict
 from viewsets.views import AutocompleteListView
+from copy import copy, deepcopy
 
 
 class ViewSetMixin(object):
@@ -42,36 +43,26 @@ class ViewSetMixin(object):
         if template:
             return template
 
-        if self.request.is_ajax():
-            ajax = "_ajax"
-        else:
-            ajax = ""
+        templates = [
+            [
+                self.manager.base_template_dir,
+                self.manager.template_dir,
+                self.name + ".html"
+            ],
+            [
+                self.manager.base_template_dir,
+                self.manager.default_app,
+                self.name + ".html"
+            ]
+        ]
 
-        if self.manager.base_template_dir:
-            templates = [
-                "%s/%s/%s%s.html" % (
-                    self.manager.base_template_dir,
-                    self.manager.template_dir,
-                    self.name,
-                    ajax),
-                "%s/%s/%s%s.html" % (
-                    self.manager.base_template_dir,
-                    self.manager.default_app,
-                    self.name,
-                    ajax)
-            ]
-        else:
-            templates = [
-                "%s/%s%s.html" % (
-                    self.manager.template_dir,
-                    self.name,
-                    ajax),
-                "%s/%s%s.html" % (
-                    self.manager.default_app,
-                    self.name,
-                    ajax)
-            ]
-        return templates
+        if self.request.is_ajax():
+            ajax_templates = deepcopy(templates)
+            for template in ajax_templates:
+                template[-1] = self.name + "_ajax.html"
+            templates = ajax_templates + templates
+
+        return [os.path.join(*bits) for bits in templates]
 
     def get_queryset(self):
         return self.manager.get_queryset(self, self.request, **self.kwargs)
