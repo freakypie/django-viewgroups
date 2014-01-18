@@ -10,6 +10,7 @@ from django.conf import settings
 from django.template.defaultfilters import slugify
 from django.utils.datastructures import SortedDict
 from viewsets.views import AutocompleteListView
+from copy import copy, deepcopy
 
 
 class ViewSetMixin(object):
@@ -42,6 +43,7 @@ class ViewSetMixin(object):
         if template:
             return template
 
+<<<<<<< HEAD
         if self.request.is_ajax():
             ajax = "_ajax"
         else:
@@ -70,8 +72,28 @@ class ViewSetMixin(object):
                     self.manager.default_app,
                     self.name,
                     ajax)
+=======
+        templates = [
+            [
+                self.manager.base_template_dir,
+                self.manager.template_dir,
+                self.name + ".html"
+            ],
+            [
+                self.manager.base_template_dir,
+                self.manager.default_app,
+                self.name + ".html"
+>>>>>>> 649087f2607af0eafc7d25fb3843f79c7e02fb3f
             ]
-        return templates
+        ]
+
+        if self.request.is_ajax():
+            ajax_templates = deepcopy(templates)
+            for template in ajax_templates:
+                template[-1] = self.name + "_ajax.html"
+            templates = ajax_templates + templates
+
+        return [os.path.join(*bits) for bits in templates]
 
     def get_queryset(self):
         return self.manager.get_queryset(self, self.request, **self.kwargs)
