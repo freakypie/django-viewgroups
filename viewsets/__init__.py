@@ -43,36 +43,6 @@ class ViewSetMixin(object):
         if template:
             return template
 
-<<<<<<< HEAD
-        if self.request.is_ajax():
-            ajax = "_ajax"
-        else:
-            ajax = ""
-
-        if self.manager.base_template_dir:
-            templates = [
-                "%s/%s/%s%s.html" % (
-                    self.manager.base_template_dir,
-                    self.manager.template_dir,
-                    self.name,
-                    ajax),
-                "%s/%s/%s%s.html" % (
-                    self.manager.base_template_dir,
-                    self.manager.default_app,
-                    self.name,
-                    ajax)
-            ]
-        else:
-            templates = [
-                "%s/%s%s.html" % (
-                    self.manager.template_dir,
-                    self.name,
-                    ajax),
-                "%s/%s%s.html" % (
-                    self.manager.default_app,
-                    self.name,
-                    ajax)
-=======
         templates = [
             [
                 self.manager.base_template_dir,
@@ -83,7 +53,6 @@ class ViewSetMixin(object):
                 self.manager.base_template_dir,
                 self.manager.default_app,
                 self.name + ".html"
->>>>>>> 649087f2607af0eafc7d25fb3843f79c7e02fb3f
             ]
         ]
 
