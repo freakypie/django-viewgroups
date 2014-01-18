@@ -52,24 +52,24 @@ class ViewSetMixin(object):
                 "%s/%s/%s%s.html" % (
                     self.manager.base_template_dir,
                     self.manager.template_dir,
-                    ajax,
-                    self.name),
+                    self.name,
+                    ajax),
                 "%s/%s/%s%s.html" % (
                     self.manager.base_template_dir,
                     self.manager.default_app,
-                    ajax,
-                    self.name)
+                    self.name,
+                    ajax)
             ]
         else:
             templates = [
                 "%s/%s%s.html" % (
                     self.manager.template_dir,
-                    ajax,
-                    self.name),
+                    self.name,
+                    ajax),
                 "%s/%s%s.html" % (
                     self.manager.default_app,
-                    ajax,
-                    self.name)
+                    self.name,
+                    ajax)
             ]
         return templates
 
@@ -186,7 +186,10 @@ class ViewSet(object):
 
     @classmethod
     def all_urls(klass):
-        urls = [(m.base_url, include(m.get_urls())) for m in klass.managers]
+        urls = []
+        for m in klass.managers:
+            if isinstance(m, klass):
+                urls.append((m.base_url, include(m.get_urls())))
         return patterns('', *urls)
 
     def get_queryset(self, view, request, **kwargs):
