@@ -1,9 +1,11 @@
 from django.db.models import Q
 from django.http import HttpResponse
-from django.views.generic.base import View
+from django.views.generic.base import View, TemplateView
 from django.views.generic.list import ListView, MultipleObjectMixin
 import json
 import operator
+from django.views.generic.detail import DetailView, SingleObjectMixin
+import traceback
 
 
 class SearchMixin(object):
@@ -99,3 +101,100 @@ class AutocompleteListView(AutocompleteMixin, ListView):
             return HttpResponse(self.to_json())
 
         return super(AutocompleteListView, self).get(request, *args, **kwargs)
+
+
+class MultipleFormsMixin(object):
+    """ processes multiple forms by key """
+    form_classes = {}
+
+    def get_form_classes(self):
+        """ returns a dictionary of all form classes """
+        return self.form_classes
+
+    def get_form_kwargs(self, key, form_class, **kwargs):
+        """ returns all arguments for a given form """
+        kwargs['prefix'] = key
+        if key in self.request.POST:
+            kwargs["data"] = self.request.POST
+            kwargs["files"] = self.request.FILES
+        return kwargs
+
+    def get_forms(self):
+        """ returns dictionary of form instances for all form classes """
+        forms = {}
+        for key, form_class in self.get_form_classes().items():
+            forms[key] = self.get_form(key, form_class)
+        return forms
+
+    def get_form(self, key, form_class):
+        """ gets an individual form instance """
+        return form_class(**self.get_form_kwargs(key, form_class))
+
+    def form_valid(self, key, form):
+        """
+        called when a form is submitted
+        (it's key must be in the response) and valid
+        """
+        pass
+
+    def form_invalid(self, key, form):
+        """ called when a form is submitted but not valid """
+        pass
+
+    def process_forms(self, forms):
+        """ checks all forms to see if one was submitted
+            will return a HttpResponse or None        
+        """
+        for key, form in forms.items():
+            print key, form
+            if form.is_bound:
+                print "form is bound"
+                if form.is_valid():
+                    print "form is valid"
+                    response = self.form_valid(key, form)
+                else:
+                    print "form is not valid"
+                    response = self.form_invalid(key, form)
+                    print form.errors.as_text()
+                if isinstance(response, HttpResponse):
+                    print "responded"
+                    return response
+        return None
+        
+
+class MultipleFormView(MultipleFormsMixin, TemplateView):
+
+    def dispatch(self, request, *args, **kwargs):
+        return TemplateView.dispatch(self, request, *args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
+        return self.render_to_response(self.get_context_data(forms=self.get_forms()))
+
+    def post(self, request, *args, **kwargs):
+        forms = self.get_forms()
+        response = self.process_forms(forms)
+
+        if response:
+            return response
+        return self.render_to_response(self.get_context_data(forms=forms))
+
+    def get_context_data(self, **kwargs):
+        return kwargs
+
+
+class MultipleFormDetailView(SingleObjectMixin, MultipleFormView):
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        return super(MultipleFormDetailView, self).get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        return super(MultipleFormDetailView, self).post(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        return super(MultipleFormDetailView, self).get_context_data(
+            object=self.object,
+            **kwargs
+        )
+
