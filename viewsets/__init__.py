@@ -39,9 +39,9 @@ class ViewSetMixin(object):
             current_app=self.manager.name)
 
     def get_template_names(self):
-        template = getattr(self, "template", None)
-        if template:
-            return template
+        template_name = getattr(self, "template_name", None)
+        if template_name:
+            return template_name
 
         templates = [
             [
@@ -95,6 +95,7 @@ class ViewSet(object):
     PK_URL = "(?P<pk>\d+)/"
     SLUG_URL = "(?P<slug>[\w\-\d]+)/"
 
+    mixin = None
     name = None
     model = None
     base_template_dir = ""
@@ -139,16 +140,6 @@ class ViewSet(object):
 
         ViewSet.managers.append(self)
 
-    def protect(self, function):
-        if not hasattr(function, "protected"):
-            def inner(self, request, *args, **kwargs):
-                if not request.user.is_authenticated():
-                    return redirect("%s?next=%s" % (settings.LOGIN_URL, request.path))
-                return function(self, request, *args, **kwargs)
-            inner.protected = True
-            return inner
-        return function
-
     def pre_dispatch(self, request, view, **kwargs):
         pass
 
@@ -159,10 +150,19 @@ class ViewSet(object):
 
             # override here or these views can't be used elsewhere
             # they will be slightly modified soon
-            class view(view_class):
-                pass
+            if self.mixin:
+                parents = (self.mixin, view_class)
+            else:
+                parents = (view_class,)
 
-            view.dispatch = self.protect(view.dispatch)
+            view = type(
+                "%s_%s_%s" % (
+                    self.__class__.__name__,
+                    self.model._meta.object_name,
+                    name
+                ),
+                parents,
+                {})
 
             # preserve csrf setting
             if getattr(view_class.dispatch, "csrf_exempt", False):
