@@ -91,6 +91,11 @@ class ViewSetDetailView(ViewSetMixin, DetailView):
     pass
 
 
+class classproperty(property):
+    def __get__(self, cls, owner):
+        return self.fget.__get__(None, owner)()
+
+
 class ViewSet(object):
     PK_URL = "(?P<pk>\d+)/"
     SLUG_URL = "(?P<slug>[\w\-\d]+)/"
@@ -98,18 +103,22 @@ class ViewSet(object):
     mixin = None
     name = None
     model = None
+    opts = None
     base_template_dir = ""
     base_url = None
     object_url = PK_URL
     template_dir = None
     default_app = "base"
-    managers = []
+    _managers = []
     exclude = []
 
     def __init__(self, name=None, model=None, template_dir=None, exclude=[]):
 
         if model:
             self.model = model
+
+        if self.model:
+            self.opts = self.model._meta
 
         if name:
             self.name = name
@@ -138,7 +147,14 @@ class ViewSet(object):
         elif not self.template_dir:
             self.template_dir = self.name
 
-        ViewSet.managers.append(self)
+        ViewSet._managers.append(self)
+
+    @classproperty
+    @classmethod
+    def managers(klass):
+        for m in klass._managers:
+            if isinstance(m, klass):
+                yield m
 
     def pre_dispatch(self, request, view, **kwargs):
         pass
@@ -162,7 +178,7 @@ class ViewSet(object):
                     name
                 ),
                 parents,
-                {})
+                {"model": self.model})
 
             # preserve csrf setting
             if getattr(view_class.dispatch, "csrf_exempt", False):
@@ -179,8 +195,7 @@ class ViewSet(object):
     def all_urls(klass):
         urls = []
         for m in klass.managers:
-            if isinstance(m, klass):
-                urls.append((m.base_url, include(m.get_urls())))
+            urls.append((m.base_url, include(m.get_urls())))
         return patterns('', *urls)
 
     def get_queryset(self, view, request, **kwargs):
@@ -208,4 +223,8 @@ class ViewSet(object):
             r'^%s%s/$' % (self.object_url, name))
 
     def extra_context(self, request, view, **kwargs):
-        return dict(manager=self, opts=self.model._meta, **kwargs)
+        return dict(
+            manager=self,
+            opts=self.model._meta,
+            **kwargs
+        )
