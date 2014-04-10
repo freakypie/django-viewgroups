@@ -166,7 +166,7 @@ class ViewSet(object):
 
             # override here or these views can't be used elsewhere
             # they will be slightly modified soon
-            if self.mixin and not issubclass(self.mixin, view_class):
+            if self.mixin and not issubclass(view_class, self.mixin):
                 parents = (self.mixin, view_class)
             else:
                 parents = (view_class,)
