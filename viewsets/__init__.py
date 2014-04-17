@@ -15,22 +15,17 @@ from copy import copy, deepcopy
 
 class ViewSetMixin(object):
 
-    def dispatch(self, request, *args, **kwargs):
-        if hasattr(self, "manager"):
-            retval = self.manager.pre_dispatch(request, self, *args, **kwargs)
-            if retval:
-                return retval
-        return super(ViewSetMixin, self).dispatch(request, *args, **kwargs)
-
     def get_context_data(self, **kwargs):
         context = super(ViewSetMixin, self).get_context_data(**kwargs)
-        context.update(self.manager.extra_context(self.request, self))
+        if getattr(self, "manager", None):
+            context.update(self.manager.extra_context(self.request, self))
         return context
 
     # need to set the current app for url namespace resolution
     def render_to_response(self, context, **response_kwargs):
-        response_kwargs["current_app"] = self.manager.name
-        context.update({"current_app": self.manager.name})
+        if getattr(self, "manager", None):
+            response_kwargs["current_app"] = self.manager.name
+            context.update({"current_app": self.manager.name})
 
         return super(ViewSetMixin, self).render_to_response(context, **response_kwargs)
 
@@ -178,14 +173,18 @@ class ViewSet(object):
                     name
                 ),
                 parents,
-                {"model": self.model})
+                {
+                    "name": name,
+                    "model": self.model,
+                    "manager": self
+                })
 
             # preserve csrf setting
             if getattr(view_class.dispatch, "csrf_exempt", False):
                 view.dispatch.__func__.csrf_exempt = True
 
-            view.name = name
-            view.manager = self
+#             view.name = name
+#             view.manager = self
             view = view.as_view(**kwargs)
             urls.append((url_regex, view, {}, name))
 
