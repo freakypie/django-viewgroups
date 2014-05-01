@@ -107,7 +107,10 @@ class ViewSet(object):
     _managers = []
     exclude = []
 
-    def __init__(self, name=None, model=None, template_dir=None, exclude=[]):
+    def __init__(self, name=None, model=None, template_dir=None, exclude=None):
+
+        if exclude:
+            self.exclude = exclude
 
         if model:
             self.model = model
@@ -133,8 +136,7 @@ class ViewSet(object):
             ("list", (ViewSetListView, r'^$')),
         ))
 
-        exclude.extend(self.exclude)
-        for name in set(exclude):
+        for name in self.exclude:
             del self.views[name]
 
         if template_dir:
