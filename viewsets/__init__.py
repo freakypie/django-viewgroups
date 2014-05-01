@@ -134,7 +134,7 @@ class ViewSet(object):
         ))
 
         exclude.extend(self.exclude)
-        for name in exclude:
+        for name in set(exclude):
             del self.views[name]
 
         if template_dir:
