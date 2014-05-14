@@ -146,18 +146,12 @@ class MultipleFormsMixin(object):
             will return a HttpResponse or None        
         """
         for key, form in forms.items():
-            print key, form
             if form.is_bound:
-                print "form is bound"
                 if form.is_valid():
-                    print "form is valid"
                     response = self.form_valid(key, form)
                 else:
-                    print "form is not valid"
                     response = self.form_invalid(key, form)
-                    print form.errors.as_text()
                 if isinstance(response, HttpResponse):
-                    print "responded"
                     return response
         return None
         
