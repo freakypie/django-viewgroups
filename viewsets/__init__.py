@@ -11,6 +11,7 @@ from django.template.defaultfilters import slugify
 from django.utils.datastructures import SortedDict
 from viewsets.views import MiningListView, FilterMixin, SearchMixin
 from copy import copy, deepcopy
+import six
 
 
 class ViewSetMixin(object):
@@ -188,7 +189,11 @@ class ViewSet(object):
 
             # preserve csrf setting
             if getattr(view_class.dispatch, "csrf_exempt", False):
-                view.dispatch.__func__.csrf_exempt = True
+                if six.PY3:
+                    view.dispatch.csrf_exempt = True
+                else:
+                    view.dispatch.__func__.csrf_exempt = True
+                    
 
 #             view.name = name
 #             view.manager = self
