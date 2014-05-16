@@ -9,7 +9,7 @@ from django.shortcuts import redirect
 from django.conf import settings
 from django.template.defaultfilters import slugify
 from django.utils.datastructures import SortedDict
-from viewsets.views import MiningListView
+from viewsets.views import MiningListView, FilterMixin, SearchMixin
 from copy import copy, deepcopy
 
 
@@ -60,7 +60,12 @@ class ViewSetMixin(object):
         return [os.path.join(*bits) for bits in templates]
 
     def get_queryset(self):
-        return self.manager.get_queryset(self, self.request, **self.kwargs)
+        qs = self.manager.get_queryset(self, self.request, **self.kwargs)
+        if isinstance(self, FilterMixin):
+            qs = self.get_filtered_queryset(qs)
+        if isinstance(self, SearchMixin):
+            qs = self.get_searched_queryset(qs)
+        return qs
 
 
 class ViewSetCreateView(ViewSetMixin, CreateView):

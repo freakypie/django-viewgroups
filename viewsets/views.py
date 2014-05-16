@@ -1,28 +1,45 @@
-from django.contrib.admin.filters import SimpleListFilter, FieldListFilter, \
-    ListFilter
+from django.contrib.admin.filters import SimpleListFilter, FieldListFilter
+from django.contrib.admin.options import IncorrectLookupParameters
+from django.contrib.admin.util import get_fields_from_path
+from django.contrib.admin.views.main import IGNORED_PARAMS
+from django.core.exceptions import ValidationError
+from django.db import models
 from django.db.models import Q
 from django.http import HttpResponse
 from django.utils.http import urlencode
 from django.views.generic.base import View, TemplateView
-from django.views.generic.detail import DetailView, SingleObjectMixin
+from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.list import ListView, MultipleObjectMixin
 import json
 import operator
-import traceback
-from django.db import models
-from django.contrib.admin.views.main import IGNORED_PARAMS
-from django.core.exceptions import SuspiciousOperation
-from django.contrib.admin.util import get_fields_from_path, \
-    lookup_needs_distinct
+
+
+class QuerysetListFilter(SimpleListFilter):
+
+    def get_choices_queryset(self):
+        raise NotImplementedError
+
+    def get_choice_label(self, obj):
+        return unicode(obj)
+
+    def lookups(self, request, model_admin):
+        for obj in self.get_choices_queryset(request, model_admin):
+            yield (obj.pk, self.get_choice_label(obj))
+
+    def queryset(self, request, queryset):
+        try:
+            return queryset.filter(**self.used_parameters)
+        except ValidationError as e:
+            raise IncorrectLookupParameters(e)
 
 
 class FilterMixin(object):
     """ provides filtering for a queryset """
     list_filter = []
+    original_queryset = None
 
     def get_filter_classes(self):
-        lookup_params = self.request.GET.copy()  # a dictionary of the query string
-        use_distinct = False
+        lookup_params = dict(self.request.GET.items())
 
         # Remove all the parameters that are globally and systematically
         # ignored.
@@ -44,7 +61,7 @@ class FilterMixin(object):
                 if callable(list_filter):
                     # This is simply a custom list filter class.
                     spec = list_filter(self.request, lookup_params,
-                        self.model, self.model_admin)
+                        self.model, self)
                 else:
                     field_path = None
                     if isinstance(list_filter, (tuple, list)):
@@ -97,6 +114,9 @@ class FilterMixin(object):
         if not queryset:
             queryset = super(FilterMixin, self).get_queryset(queryset)
 
+        if not self.original_queryset:
+            self.original_queryset = queryset
+
         self.data = self.get_filter_data()
         self.filters = self.get_filter_classes()
 #         for filter_class in self.get_filter_classes():
@@ -113,6 +133,7 @@ class FilterMixin(object):
         return self.get_filtered_queryset(queryset)
 
     def get_context_data(self, **kwargs):
+        kwargs['original_queryset'] = kwargs.get("original_queryset", self.original_queryset)
         return super(FilterMixin, self).get_context_data(
             filters=getattr(self, "filters", []),
             **kwargs)
@@ -123,6 +144,7 @@ class SearchMixin(object):
     search_term = "q"
     allow_empty_search = True
     ordering = []
+    original_queryset = None
 
     def get_search_fields(self):
         return getattr(self, "search_fields")
@@ -138,6 +160,7 @@ class SearchMixin(object):
         return self.request.REQUEST.copy()
 
     def perform_search(self, queryset):
+
         self.query = ""
         data = self.get_search_data()
         terms = self.get_terms(data)
@@ -157,8 +180,11 @@ class SearchMixin(object):
         return queryset
 
     def get_searched_queryset(self, queryset=None):
-        if not queryset:
+        if queryset is None:
             queryset = super(SearchMixin, self).get_queryset(queryset)
+
+        if not self.original_queryset:
+            self.original_queryset = queryset
 
         queryset = self.perform_search(queryset)
         return queryset
@@ -170,8 +196,10 @@ class SearchMixin(object):
         return not self.request.REQUEST.get(self.search_term, None)
 
     def get_context_data(self, **kwargs):
+        kwargs['original_queryset'] = kwargs.get("original_queryset", self.original_queryset)
         return super(SearchMixin, self).get_context_data(
-            query=getattr(self, "query", None),
+            query=getattr(self, "query", ""),
+            search=self.search_term,
             **kwargs
         )
 
@@ -217,7 +245,7 @@ class AutocompleteListView(AutocompleteMixin, ListView):
 
 
 class MiningListView(FilterMixin, SearchMixin, ListView):
-    pass
+    paginate_by = 15
 
 
 class MultipleFormsMixin(object):
