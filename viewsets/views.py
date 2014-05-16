@@ -140,14 +140,14 @@ class FilterMixin(object):
 
 
 class SearchMixin(object):
-    search_fields = None
+    search_fields = []
     search_term = "q"
     allow_empty_search = True
     ordering = []
     original_queryset = None
 
     def get_search_fields(self):
-        return getattr(self, "search_fields")
+        return getattr(self, "search_fields", [])
 
     def get_query(self, data):
         return data.get(self.search_term, "")
@@ -196,10 +196,12 @@ class SearchMixin(object):
         return not self.request.REQUEST.get(self.search_term, None)
 
     def get_context_data(self, **kwargs):
-        kwargs['original_queryset'] = kwargs.get("original_queryset", self.original_queryset)
+        query = getattr(self, "query", "")
+        if query:
+            kwargs['original_queryset'] = kwargs.get("original_queryset", self.original_queryset)
         return super(SearchMixin, self).get_context_data(
-            query=getattr(self, "query", ""),
-            search=self.search_term,
+            query=query,
+            search=self.get_search_fields() and self.search_term,
             **kwargs
         )
 
