@@ -69,6 +69,12 @@ class ViewSetMixin(object):
         return qs
 
 
+class NoDetailMixin(object):
+
+    def get_success_url(self):
+        return reverse("base:list", current_app=self.manager.name)
+
+
 class ViewSetCreateView(ViewSetMixin, CreateView):
     pass
 
@@ -193,7 +199,7 @@ class ViewSet(object):
                     view.dispatch.csrf_exempt = True
                 else:
                     view.dispatch.__func__.csrf_exempt = True
-                    
+
 
 #             view.name = name
 #             view.manager = self
