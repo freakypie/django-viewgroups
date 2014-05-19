@@ -72,7 +72,7 @@ class ActionListView(ActionMixin, ListView):
         return self.render_to_response(context)
 
 
-class AdminList(FilterMixin, SearchMixin, TableMixin, ActionListView):
+class AdminListView(FilterMixin, SearchMixin, TableMixin, ActionListView):
     paginate_by = 25
 
 

@@ -9,7 +9,7 @@ from django.shortcuts import redirect
 from django.conf import settings
 from django.template.defaultfilters import slugify
 from django.utils.datastructures import SortedDict
-from viewsets.views import MiningListView, FilterMixin, SearchMixin
+from viewsets.views import FilterMixin, SearchMixin, AdminListView
 from copy import copy, deepcopy
 import six
 from viewsets.mixins.sort import SortMixin
@@ -93,7 +93,7 @@ class ViewSetDeleteView(ViewSetMixin, DeleteView):
             current_app=self.manager.name)
 
 
-class ViewSetListView(ViewSetMixin, MiningListView):
+class ViewSetListView(ViewSetMixin, AdminListView):
     paginate_by = 25
 
 
