@@ -1,209 +1,13 @@
-from django.contrib.admin.filters import SimpleListFilter, FieldListFilter
-from django.contrib.admin.options import IncorrectLookupParameters
-from django.contrib.admin.util import get_fields_from_path
-from django.contrib.admin.views.main import IGNORED_PARAMS
-from django.core.exceptions import ValidationError
-from django.db import models
-from django.db.models import Q
 from django.http import HttpResponse
-from django.utils.http import urlencode
 from django.views.generic.base import View, TemplateView
 from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.list import ListView, MultipleObjectMixin
 import json
-import operator
 
-
-class QuerysetListFilter(SimpleListFilter):
-
-    def get_choices_queryset(self):
-        raise NotImplementedError
-
-    def get_choice_label(self, obj):
-        return unicode(obj)
-
-    def lookups(self, request, model_admin):
-        for obj in self.get_choices_queryset(request, model_admin):
-            yield (obj.pk, self.get_choice_label(obj))
-
-    def queryset(self, request, queryset):
-        try:
-            return queryset.filter(**self.used_parameters)
-        except ValidationError as e:
-            raise IncorrectLookupParameters(e)
-
-
-class FilterMixin(object):
-    """ provides filtering for a queryset """
-    list_filter = []
-    original_queryset = None
-
-    def get_filter_classes(self):
-        lookup_params = dict(self.request.GET.items())
-
-        # Remove all the parameters that are globally and systematically
-        # ignored.
-        for ignored in IGNORED_PARAMS:
-            if ignored in lookup_params:
-                del lookup_params[ignored]
-
-        # Normalize the types of keys
-        for key, value in lookup_params.items():
-            if not isinstance(key, str):
-                # 'key' will be used as a keyword argument later, so Python
-                # requires it to be a string.
-                del lookup_params[key]
-                lookup_params["{}".format(key)] = value
-
-        filter_specs = []
-        if self.list_filter:
-            for list_filter in self.list_filter:
-                if callable(list_filter):
-                    # This is simply a custom list filter class.
-                    spec = list_filter(self.request, lookup_params,
-                        self.model, self)
-                else:
-                    field_path = None
-                    if isinstance(list_filter, (tuple, list)):
-                        # This is a custom FieldListFilter class for a given field.
-                        field, field_list_filter_class = list_filter
-                    else:
-                        # This is simply a field name, so use the default
-                        # FieldListFilter class that has been registered for
-                        # the type of the given field.
-                        field, field_list_filter_class = list_filter, FieldListFilter.create
-                    if not isinstance(field, models.Field):
-                        field_path = field
-                        field = get_fields_from_path(self.model, field_path)[-1]
-                    spec = field_list_filter_class(field, self.request, lookup_params,
-                        self.model, self, field_path=field_path)
-
-                if spec and spec.has_output():
-                    filter_specs.append(spec)
-
-        return filter_specs
-
-    def get_query_string(self, new_params=None, remove=None):
-        """ pulled from the changelist object in the django admin """
-
-        if new_params is None:
-            new_params = {}
-
-        if remove is None:
-            remove = []
-
-        p = dict(self.request.GET.items())
-        for r in remove:
-            for k in p.keys():
-                if k.startswith(r):
-                    del p[k]
-
-        for k, v in new_params.items():
-            if v is None:
-                if k in p:
-                    del p[k]
-            else:
-                p[k] = v
-
-        return '?' + urlencode(p)
-
-    def get_filter_data(self):
-        return dict(self.request.GET.items())
-
-    def get_filtered_queryset(self, queryset=None):
-        if not queryset:
-            queryset = super(FilterMixin, self).get_queryset(queryset)
-
-        if not self.original_queryset:
-            self.original_queryset = queryset
-
-        self.data = self.get_filter_data()
-        self.filters = self.get_filter_classes()
-#         for filter_class in self.get_filter_classes():
-#             filter = filter_class(self.request, self.data, queryset.model, self)
-#             self.filters.append(filter)
-
-        for f in self.filters:
-            queryset = f.queryset(self.request, queryset)
-            f.items = f.choices(self)
-
-        return queryset
-
-    def get_queryset(self, queryset=None):
-        return self.get_filtered_queryset(queryset)
-
-    def get_context_data(self, **kwargs):
-        kwargs['original_queryset'] = kwargs.get("original_queryset", self.original_queryset)
-        return super(FilterMixin, self).get_context_data(
-            filters=getattr(self, "filters", []),
-            **kwargs)
-
-
-class SearchMixin(object):
-    search_fields = []
-    search_term = "q"
-    allow_empty_search = True
-    ordering = []
-    original_queryset = None
-
-    def get_search_fields(self):
-        return getattr(self, "search_fields", [])
-
-    def get_query(self, data):
-        return data.get(self.search_term, "")
-
-    def get_terms(self, data):
-        self.query = self.get_query(data)
-        return self.query.split()
-
-    def get_search_data(self):
-        return self.request.REQUEST.copy()
-
-    def perform_search(self, queryset):
-
-        self.query = ""
-        data = self.get_search_data()
-        terms = self.get_terms(data)
-        fields = self.get_search_fields()
-
-        if fields and terms:
-            for term in terms:
-                filters = [Q(**{field + "__icontains": term}) for field in fields]
-                queryset = queryset.filter(reduce(operator.or_, filters))
-
-        # if hitting page with an empty get request return an empty queryset
-        if not self.allow_empty_search and self.is_empty_search():
-            queryset = self.model.objects.none()
-
-        queryset.searched = True
-
-        return queryset
-
-    def get_searched_queryset(self, queryset=None):
-        if queryset is None:
-            queryset = super(SearchMixin, self).get_queryset(queryset)
-
-        if not self.original_queryset:
-            self.original_queryset = queryset
-
-        queryset = self.perform_search(queryset)
-        return queryset
-
-    def get_queryset(self, queryset=None):
-        return self.get_searched_queryset(queryset)
-
-    def is_empty_search(self):
-        return not self.request.REQUEST.get(self.search_term, None)
-
-    def get_context_data(self, **kwargs):
-        query = getattr(self, "query", "")
-        if query:
-            kwargs['original_queryset'] = kwargs.get("original_queryset", self.original_queryset)
-        return super(SearchMixin, self).get_context_data(
-            query=query,
-            search=self.get_search_fields() and self.search_term,
-            **kwargs
-        )
+from viewsets.mixins.actions import ActionMixin
+from viewsets.mixins.filter import FilterMixin
+from viewsets.mixins.search import SearchMixin
+from viewsets.mixins.sort import TableMixin
 
 
 class AutocompleteMixin(SearchMixin):
@@ -246,8 +50,30 @@ class AutocompleteListView(AutocompleteMixin, ListView):
         return super(AutocompleteListView, self).get(request, *args, **kwargs)
 
 
-class MiningListView(FilterMixin, SearchMixin, ListView):
-    paginate_by = 15
+class ActionListView(ActionMixin, ListView):
+
+    def post(self, request, *args, **kwargs):
+
+        self.object_list = self.get_queryset()
+
+        # execute action?
+        # must be before list editable which will always activate
+        # if it is set.
+        if self.action_name in request.POST:
+            action = self.request.POST.get(self.action_name, None)
+            retval = self.perform_action(action)
+            if retval:
+                return retval
+
+        context = self.get_context_data(
+            object_list=self.object_list,
+        )
+
+        return self.render_to_response(context)
+
+
+class AdminList(FilterMixin, SearchMixin, TableMixin, ActionListView):
+    paginate_by = 25
 
 
 class MultipleFormsMixin(object):

@@ -12,6 +12,7 @@ from django.utils.datastructures import SortedDict
 from viewsets.views import MiningListView, FilterMixin, SearchMixin
 from copy import copy, deepcopy
 import six
+from viewsets.mixins.sort import SortMixin
 
 
 class ViewSetMixin(object):
@@ -66,6 +67,8 @@ class ViewSetMixin(object):
             qs = self.get_filtered_queryset(qs)
         if isinstance(self, SearchMixin):
             qs = self.get_searched_queryset(qs)
+        if isinstance(self, SortMixin):
+            qs = self.get_sorted_queryset(qs)
         return qs
 
 
