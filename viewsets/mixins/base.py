@@ -1,3 +1,5 @@
+from copy import deepcopy
+from django.core.urlresolvers import reverse
 
 
 class SessionDataMixin(object):
@@ -16,7 +18,5 @@ class SessionDataMixin(object):
         if len(items) > 0:
             data = dict(items)
             self.request.session[prefix] = data
-
-        print(self.request.META["QUERY_STRING"])
 
         return data

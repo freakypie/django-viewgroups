@@ -11,7 +11,7 @@ class ActionMixin(object):
     """
     action_name = "action"
     selected_name = "selected"
-    actions = ['delete_selected']
+    actions = []  # ['delete_selected']
     delete_selected_template = "danemco/actions/delete_selected.html"
 
     # you can provide your own with a mixin or by extending your class
@@ -30,8 +30,11 @@ class ActionMixin(object):
     delete_selected.short_description = "Delete selected %(verbose_name_plural)s"
 
     def get_actions(self):
+        return self.actions
+
+    def prepare_actions(self):
         self.action_list = SortedDict()
-        for action in self.actions:
+        for action in self.get_actions():
             if callable(action):
                 slug = action.__name__
                 func = action
@@ -55,10 +58,8 @@ class ActionMixin(object):
 
     def get_context_data(self, **kwargs):
 
-        print ("getting actions",)
-
         if not hasattr(self, "action_list"):
-            self.action_list = self.get_actions()
+            self.action_list = self.prepare_actions()
 
         actions = [(k, a[0]) for k, a in self.action_list.items()]
 

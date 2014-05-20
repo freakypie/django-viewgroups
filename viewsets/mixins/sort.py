@@ -4,6 +4,8 @@ from django.utils.encoding import StrAndUnicode
 from django.utils.safestring import mark_safe
 
 from viewsets.mixins.base import SessionDataMixin
+import six
+from django.db.models.fields import FieldDoesNotExist
 
 
 class Header(StrAndUnicode):
@@ -95,39 +97,147 @@ class SortMixin(SessionDataMixin):
             **kwargs)
 
 
+class TableField(object):
+
+    def __init__(self, view, field):
+        self.view = view
+        self.field = field
+
+    def __str__(self):
+        return "{}: {}".format(type(self), self.field)
+
+    def header(self):
+        return self.field
+
+    def sort(self):
+        return None
+
+    def value(self, instance):
+        return unicode(instance)
+
+
+class UnicodeTableField(TableField):
+
+    def valid(self):
+        return self.field == "__unicode__"
+
+    def header(self):
+        try:
+            return self.view.model._meta.verbose_name
+        except AttributeError:
+            return ""
+
+    def sort(self):
+        return ":default:"
+
+
+class CallableTableField(TableField):
+
+    def valid(self):
+        return callable(self.field)
+
+    def header(self):
+        return getattr(self.field, "short_description",
+            self.field.__name__.replace("_", " ").title())
+
+    def sort(self):
+        return getattr(self.field, "sort_field", None)
+
+    def value(self, instance):
+        return self.field(instance)
+
+
+class ViewCallableTableField(CallableTableField):
+
+    def valid(self):
+        if isinstance(self.field, six.string_types):
+            self.field = getattr(self.view, self.field, None)
+            return self.field is not None
+        return False
+
+
+class ManagerCallableTableField(CallableTableField):
+
+    def valid(self):
+        manager = getattr(self.view, "manager", None)
+        if manager and isinstance(self.field, six.string_types):
+            self.field = getattr(manager, self.field, None)
+            return self.field is not None
+        return False
+
+
+class ModelTableField(CallableTableField):
+    is_model_field = False
+
+    def valid(self):
+        if isinstance(self.field, six.string_types):
+            field = self.view.model
+            for subfield in self.field.split("__"):
+                item = getattr(field, subfield, None)
+
+                if isinstance(item, ReverseSingleRelatedObjectDescriptor):
+                    item = item.get_query_set().model
+
+                if not item:
+                    try:
+                        # if its a field, then get it's verbose name
+                        item = field._meta.get_field(subfield).verbose_name
+                        self.is_model_field = True
+                    except FieldDoesNotExist:
+                        pass
+
+                field = item
+
+                if not field:
+                    break
+
+            self.attr = field
+
+            return self.attr is not None
+        return False
+
+    def header(self):
+        return getattr(self.attr, "short_description", None) or \
+            getattr(self.attr, "name", None) or \
+            self.field.title()
+
+    def sort(self):
+        if self.is_model_field:
+            return self.field
+        else:
+            return getattr(self.field, "sort_field", None)
+
+    def value(self, instance):
+        retval = instance
+        for bit in self.field.split("__"):
+            retval = getattr(retval, bit, None)
+            if retval is None:
+                break  # we tried
+
+        if callable(retval):
+            retval = retval()
+
+        return retval
+
+
 class TableMixin(SortMixin):
     """ causes views with a list to have enough context to make a table """
     list_display = ["__unicode__"]
     list_display_links = []
     list_editable = None  # NOT Implemented
     list_detail_link = ""
+    field_sources = [UnicodeTableField, CallableTableField,
+        ViewCallableTableField, ManagerCallableTableField, ModelTableField]
 
     def get_allowed_sort_fields(self, model):
-        self._list_display = self.get_list_display()
+        self._list_display = self.prepare_list_display()
         for field in self._list_display:
-            if callable(field):
-                sort = getattr(field, "sort_field", field)
-                if sort:
-                    yield sort
-            elif isinstance(field, basestring) and not "__" in field:
-                retval = model._meta.get_field_by_name(field)
-                if retval:
-                    yield field
+            sort_field = field.sort()
+            if sort_field:
+                yield sort_field
 
-    def get_list_display(self, fields=None):
-        """ get the fields to display """
-
-        if not fields:
-            fields = getattr(self, "list_display")
-
-        retval = []
-        for field in fields:
-            if field not in ("__unicode__",) and hasattr(self, field):
-                retval.append(getattr(self, field))
-            else:
-                retval.append(field)
-
-        return retval
+    def get_list_display(self):
+        return getattr(self, "list_display")
 
     def get_detail_link(self, obj):
         name = getattr(self, "list_detail_link")
@@ -138,101 +248,49 @@ class TableMixin(SortMixin):
     def get_list_display_links(self):
         return getattr(self, "list_display_links")
 
+    def prepare_list_display(self):
+        retval = []
+        for field in self.get_list_display():
+            for source in self.field_sources:
+                column = source(self, field)
+                if column.valid():
+                    retval.append(column)
+                    break
+
+        return retval
+
     def get_headers(self, object_list, list_display):
         """ requires that self.object_list is set before called """
 
-        if object_list is None:
-            object_list = self.object_list
-
         for field in list_display:
-
-            sort_field = field
-            if field == "__unicode__":
-                # unicode default
-                retval = object_list.model._meta.verbose_name
-                sort_field = ":default:"
-
-            elif callable(field):
-                retval = field
-
-            elif isinstance(field, basestring):
-                if hasattr(self, field):
-                    # view field
-                    retval = getattr(self, field, None)
-
+            sort_field = field.sort()
+            if sort_field:
+                if sort_field in self.sorting_fields:
+                    sorting = 1
+                elif "-%s" % sort_field in self.sorting_fields:
+                    sorting = -1
                 else:
-                    # model field
-                    retval = self.object_list.model
-                    for subfield in field.split("__"):
-                        item = getattr(retval, subfield, None)
+                    sorting = 0
 
-                        if isinstance(item, ReverseSingleRelatedObjectDescriptor):
-                            item = item.get_query_set().model
-
-                        if not item:
-                            try:
-                                # if its a field, then get it's verbose name
-                                item = retval._meta.get_field(subfield).verbose_name.title()
-                            except Exception:
-                                pass
-
-                        retval = item
-
-                        if not retval:
-                            break
-
-            if callable(retval):
-                sort_field = None
-
-                if hasattr(retval, "short_description"):
-                    retval = retval.short_description
-                else:
-                    retval = retval.__name__.replace("_", " ").title()
-
-                if hasattr(field, "sort_field"):
-                    sort_field = field.sort_field
-
-            if sort_field in self.sorting_fields:
-                sorting = 1
-            elif "-%s" % sort_field in self.sorting_fields:
-                sorting = -1
-            else:
-                sorting = 0
-
-            yield Header(u"%s" % retval, sort_field, sorting)
+            yield Header(field.header(), sort_field, sorting)
 
     def get_rows(self, object_list, list_display):
-        if object_list is None:
-            object_list = self.object_list
         for obj in object_list:
             yield obj, self.get_row(obj, list_display)
 
     def get_row(self, obj, list_display):
         for name, cell in self.get_cells(obj, list_display):
             if name in self.get_list_display_links():
-                cell = "<a href='%s'>%s</a>" % (self.get_detail_link(obj), cell)
+                cell = "<a href='{}'>{}</a>".format(self.get_detail_link(obj), cell)
 
             yield mark_safe(cell)
 
     def get_cells(self, obj, list_display):
-        for idx, field in enumerate(list_display):
+        for field in list_display:
             try:
-                if callable(field):
-                    retval = field(obj)
-                    field = getattr(field, "short_description", field.__name__)
-                else:
-                    retval = obj
-                    if field == "__unicode__":
-                        retval = getattr(retval, field, None)
-                    else:
-                        for bit in field.split("__"):
-                            retval = getattr(retval, bit, None)
-                            if retval is None:
-                                break  # we tried
-
-                    if callable(retval):
-                        retval = retval()
-            except Exception, ex:
+                retval = field.value(obj)
+            except Exception as ex:
+                print (type(ex), ex)
                 retval = "_"
 
             if retval is None:
@@ -241,7 +299,8 @@ class TableMixin(SortMixin):
             yield field, retval
 
     def get_context_data(self, **kwargs):
-        list_display = self.get_list_display()
+        list_display = getattr(self, "_list_display", None) or \
+            self.prepare_list_display()
         context = super(TableMixin, self).get_context_data(
             list_display=list_display,
             list_display_links=self.get_list_display_links(),

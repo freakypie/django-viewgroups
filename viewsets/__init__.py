@@ -1,75 +1,19 @@
-import os
-
-from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from django.views.generic.list import ListView
-from django.views.generic.detail import DetailView
+from copy import copy, deepcopy
+from django.conf import settings
 from django.conf.urls import patterns, include
 from django.core.urlresolvers import reverse
 from django.shortcuts import redirect
-from django.conf import settings
 from django.template.defaultfilters import slugify
 from django.utils.datastructures import SortedDict
+from django.views.generic.detail import DetailView
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.views.generic.list import ListView
 from viewsets.views import FilterMixin, SearchMixin, AdminListView
-from copy import copy, deepcopy
+import os
 import six
+
+from viewsets.mixins.manager import ViewSetMixin
 from viewsets.mixins.sort import SortMixin
-
-
-class ViewSetMixin(object):
-
-    def get_context_data(self, **kwargs):
-        context = super(ViewSetMixin, self).get_context_data(**kwargs)
-        if getattr(self, "manager", None):
-            context.update(self.manager.extra_context(self.request, self))
-        return context
-
-    # need to set the current app for url namespace resolution
-    def render_to_response(self, context, **response_kwargs):
-        if getattr(self, "manager", None):
-            response_kwargs["current_app"] = self.manager.name
-            context.update({"current_app": self.manager.name})
-
-        return super(ViewSetMixin, self).render_to_response(context, **response_kwargs)
-
-    def get_success_url(self):
-        return reverse(self.manager.default_app + ":detail", args=[self.object.id],
-            current_app=self.manager.name)
-
-    def get_template_names(self):
-        template_name = getattr(self, "template_name", None)
-        if template_name:
-            return template_name
-
-        templates = [
-            [
-                self.manager.base_template_dir,
-                self.manager.template_dir,
-                self.name + ".html"
-            ],
-            [
-                self.manager.base_template_dir,
-                self.manager.default_app,
-                self.name + ".html"
-            ]
-        ]
-
-        if self.request.is_ajax():
-            ajax_templates = deepcopy(templates)
-            for template in ajax_templates:
-                template[-1] = self.name + "_ajax.html"
-            templates = ajax_templates + templates
-
-        return [os.path.join(*bits) for bits in templates]
-
-    def get_queryset(self):
-        qs = self.manager.get_queryset(self, self.request, **self.kwargs)
-        if isinstance(self, FilterMixin):
-            qs = self.get_filtered_queryset(qs)
-        if isinstance(self, SearchMixin):
-            qs = self.get_searched_queryset(qs)
-        if isinstance(self, SortMixin):
-            qs = self.get_sorted_queryset(qs)
-        return qs
 
 
 class NoDetailMixin(object):

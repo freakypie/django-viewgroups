@@ -32,6 +32,9 @@ class FilterMixin(SessionDataMixin):
     list_filter = []
     original_queryset = None
 
+    def get_list_filters(self):
+        return self.list_filter
+
     def get_filter_classes(self):
         lookup_params = self.get_data()
 
@@ -50,8 +53,9 @@ class FilterMixin(SessionDataMixin):
                 lookup_params["{}".format(key)] = value
 
         filter_specs = []
-        if self.list_filter:
-            for list_filter in self.list_filter:
+        list_filters = self.get_list_filters()
+        if list_filters:
+            for list_filter in list_filters:
                 if callable(list_filter):
                     # This is simply a custom list filter class.
                     spec = list_filter(self.request, lookup_params,
