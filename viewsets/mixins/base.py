@@ -13,10 +13,29 @@ class SessionDataMixin(object):
 
     def get_data(self):
         prefix = self.get_session_prefix()
-        data = self.request.session.get(prefix, {})
-        items = self.request.GET.items()
-        if len(items) > 0:
-            data = dict(items)
-            self.request.session[prefix] = data
 
-        return data
+        data = getattr(self, "___stored_data", None)
+        if data is None:
+            data = self.request.session.get(prefix, {})
+            items = self.request.GET.copy()
+            items.pop("page", 1)
+
+            # clear
+            cleared = False
+            if "_" in items:
+                print("data cleared")
+                data = {}
+                cleared = True
+            items.pop("_", None)
+
+            if len(items.keys()) > 0 or cleared:
+                for n, v in items.items():
+                    data[n] = v
+                print("Saved session", data)
+                self.request.session[prefix] = data
+
+            self.___stored_data = data
+
+        print("data", prefix, data)
+
+        return data.copy()

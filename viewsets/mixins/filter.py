@@ -27,6 +27,19 @@ class QuerysetListFilter(SimpleListFilter):
             raise IncorrectLookupParameters(e)
 
 
+class FakeRequest(object):
+
+    def __init__(self, request, **kwargs):
+        self.original_request = request
+        self.user = request.user
+        self.GET = request.GET
+        self.REQUEST = request.REQUEST
+        self.POST = request.POST
+        self.META = request.META
+        for n, v in kwargs.items():
+            setattr(self, n, v)
+
+
 class FilterMixin(SessionDataMixin):
     """ provides filtering for a queryset """
     list_filter = []
@@ -52,6 +65,8 @@ class FilterMixin(SessionDataMixin):
                 del lookup_params[key]
                 lookup_params["{}".format(key)] = value
 
+        request = FakeRequest(self.request, GET=self.get_data())
+
         filter_specs = []
         list_filters = self.get_list_filters()
         if list_filters:
@@ -73,7 +88,7 @@ class FilterMixin(SessionDataMixin):
                     if not isinstance(field, models.Field):
                         field_path = field
                         field = get_fields_from_path(self.model, field_path)[-1]
-                    spec = field_list_filter_class(field, self.request, lookup_params,
+                    spec = field_list_filter_class(field, request, lookup_params,
                         self.model, self, field_path=field_path)
 
                 if spec and spec.has_output():
@@ -105,9 +120,6 @@ class FilterMixin(SessionDataMixin):
 
         return '?' + urlencode(p)
 
-    def get_filter_data(self):
-        return dict(self.request.GET.items())
-
     def get_filtered_queryset(self, queryset=None):
         if not queryset:
             queryset = super(FilterMixin, self).get_queryset(queryset)
@@ -115,11 +127,7 @@ class FilterMixin(SessionDataMixin):
         if not self.original_queryset:
             self.original_queryset = queryset
 
-        self.data = self.get_filter_data()
         self.filters = self.get_filter_classes()
-#         for filter_class in self.get_filter_classes():
-#             filter = filter_class(self.request, self.data, queryset.model, self)
-#             self.filters.append(filter)
 
         for f in self.filters:
             queryset = f.queryset(self.request, queryset)

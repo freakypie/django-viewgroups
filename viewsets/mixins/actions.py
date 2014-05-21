@@ -64,8 +64,6 @@ class ActionMixin(object):
 
         actions = [(k, a[0]) for k, a in self.action_list.items()]
 
-        print (actions,)
-
         return super(ActionMixin, self).get_context_data(
             action_name=self.action_name,
             selected_name=self.selected_name,
