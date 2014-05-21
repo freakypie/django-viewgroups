@@ -268,13 +268,12 @@ class TableMixin(SortMixin):
 
         for field in list_display:
             sort_field = field.sort()
+            sorting = 0
             if sort_field:
                 if sort_field in self.sorting_fields:
                     sorting = 1
                 elif "-%s" % sort_field in self.sorting_fields:
                     sorting = -1
-                else:
-                    sorting = 0
 
             yield Header(field.header(), sort_field, sorting)
 
