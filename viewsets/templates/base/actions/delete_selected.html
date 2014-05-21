@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+
+<form action="." method="post">{% csrf_token %}
+    <input type="hidden" name="{{ action_name }}" value="{{ action }}">
+    <h2>Delete selected {{ opts.verbose_name_plural }}</h2>
+    <p>Are you sure you wish to delete these {{ opts.verbose_name_plural }}? ({{ queryset.count }})</p>
+    <div class="alert alert-danger">
+        <b>Warning!</b>: Related data that depends on these objects will also be deleted.
+    </div>
+    <ul>{% for object in queryset %}
+        <li>
+            <input type="hidden" value="{{ object.id }}" name="{{ selected_name }}" />
+            {{ object }}
+        </li>{% endfor %}
+    </ul>
+    <button class="btn btn-danger" name="confirmed" value="1">Delete them</button>
+    <a class="btn" href=".">Whoa!, don't do it!</a>
+</form>
+
+{% endblock content %}

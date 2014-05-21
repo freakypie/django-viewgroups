@@ -12,7 +12,7 @@ class ActionMixin(object):
     action_name = "action"
     selected_name = "selected"
     actions = []  # ['delete_selected']
-    delete_selected_template = "danemco/actions/delete_selected.html"
+    delete_selected_template = "base/actions/delete_selected.html"
 
     # you can provide your own with a mixin or by extending your class
     def delete_selected(self, request, queryset):
@@ -26,6 +26,7 @@ class ActionMixin(object):
             "action_name": self.action_name,
             "action": request.REQUEST.get(self.action_name),
             "queryset": queryset,
+            "opts": queryset.model._meta
         })
     delete_selected.short_description = "Delete selected %(verbose_name_plural)s"
 
@@ -75,7 +76,7 @@ class ActionMixin(object):
         """
         Executes the given action and Returns None or an HttpResponse
         """
-        self.action_list = self.get_actions()
+        self.action_list = self.prepare_actions()
         if action and action in self.action_list:
             title, func = self.action_list.get(action)
             ids = self.request.POST.getlist(self.selected_name)

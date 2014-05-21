@@ -6,6 +6,7 @@ from django.utils.safestring import mark_safe
 from viewsets.mixins.base import SessionDataMixin
 import six
 from django.db.models.fields import FieldDoesNotExist
+from django.utils.html import escapejs, escape
 
 
 class Header(StrAndUnicode):
@@ -295,7 +296,9 @@ class TableMixin(SortMixin):
                 retval = field.value(obj)
             except Exception as ex:
                 print (type(ex), ex)
-                retval = "_"
+                retval = "<i style='color:darkred;' " + \
+                    "class='glyphicon glyphicon-exclamation-sign' " + \
+                    "title='{}: {}'></i>".format(type(ex).__name__, escape(str(ex)))
 
             if retval is None:
                 retval = "_"
