@@ -230,8 +230,8 @@ class TableMixin(SortMixin):
     list_display_links = []
     list_editable = None  # NOT Implemented
     list_detail_link = ""
-    field_sources = [UnicodeTableField, CallableTableField,
-        ViewCallableTableField, ManagerCallableTableField, ModelTableField]
+    field_sources = [UnicodeTableField, CallableTableField, ModelTableField,
+        ViewCallableTableField, ManagerCallableTableField]
 
     def get_allowed_sort_fields(self, model):
         self._list_display = self.prepare_list_display()
