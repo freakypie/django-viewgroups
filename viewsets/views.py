@@ -105,8 +105,8 @@ class MultipleFormsMixin(object):
 
     def form_valid(self, key, form):
         """
-        called when a form is submitted
-        (it's key must be in the response) and valid
+        called when a form is submitted and valid
+        (it's key must be in the request)
         """
         pass
 

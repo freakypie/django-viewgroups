@@ -147,7 +147,6 @@ class ViewSet(object):
                 else:
                     view.dispatch.__func__.csrf_exempt = True
 
-
 #             view.name = name
 #             view.manager = self
             view = view.as_view(**kwargs)

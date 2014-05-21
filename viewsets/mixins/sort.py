@@ -102,6 +102,7 @@ class TableField(object):
     def __init__(self, view, field):
         self.view = view
         self.field = field
+        self.original = self.field
 
     def __str__(self):
         return "{}: {}".format(type(self), self.field)
@@ -144,6 +145,8 @@ class CallableTableField(TableField):
         return getattr(self.field, "sort_field", None)
 
     def value(self, instance):
+        if hasattr(self.field, "requires_request"):
+            return self.field(self.view.request, instance)
         return self.field(instance)
 
 
@@ -279,8 +282,9 @@ class TableMixin(SortMixin):
             yield obj, self.get_row(obj, list_display)
 
     def get_row(self, obj, list_display):
+        list_display_links = self.get_list_display_links()
         for name, cell in self.get_cells(obj, list_display):
-            if name in self.get_list_display_links():
+            if name in list_display_links:
                 cell = "<a href='{}'>{}</a>".format(self.get_detail_link(obj), cell)
 
             yield mark_safe(cell)
@@ -296,7 +300,7 @@ class TableMixin(SortMixin):
             if retval is None:
                 retval = "_"
 
-            yield field, retval
+            yield field.original, retval
 
     def get_context_data(self, **kwargs):
         list_display = getattr(self, "_list_display", None) or \
