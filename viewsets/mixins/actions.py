@@ -1,7 +1,6 @@
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.utils.datastructures import SortedDict
-from django.utils.encoding import force_unicode
 
 
 class ActionMixin(object):
@@ -47,8 +46,8 @@ class ActionMixin(object):
 
             if hasattr(func, "short_description"):
                 title = func.short_description % {
-                    "verbose_name": force_unicode(self.model._meta.verbose_name),
-                    "verbose_name_plural": force_unicode(self.model._meta.verbose_name_plural)
+                    "verbose_name": self.model._meta.verbose_name,
+                    "verbose_name_plural": self.model._meta.verbose_name_plural
                 }
             else:
                 title = slug.title().replace("_", " ")
