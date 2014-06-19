@@ -11,10 +11,16 @@ from django.utils.functional import lazy
 class ViewSetMixin(object):
     list_detail_link = "base:detail"
 
+    def get_title(self):
+        return self.name.replace("-", " ").title()
+
     def get_context_data(self, **kwargs):
         context = super(ViewSetMixin, self).get_context_data(**kwargs)
         if getattr(self, "manager", None):
-            context.update(self.manager.extra_context(self.request, self))
+            context.update(
+                self.manager.extra_context(self.request, self),
+                title=self.get_title()
+            )
         return context
 
     # need to set the current app for url namespace resolution

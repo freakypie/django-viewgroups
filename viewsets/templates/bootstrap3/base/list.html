@@ -23,6 +23,16 @@ $(function() {
 
 
 {% block links %}
+
+    {% for link in manager.links.default_global %}
+    {% url manager.name|add:':'|add:link.name as url %}
+    {% if url %}
+        <a class="btn btn-default" href="{{ url }}">{{ link.get_title }}</a>
+    {% else %}
+        {{ manager.name|add:':'|add:link.name }} is not a valid url
+    {% endif %}
+    {% endfor %}
+
     {% url 'base:create' as create %}
     {% if create %}
     <a class="btn btn-default" href="{{ create }}">

@@ -66,7 +66,14 @@ class ViewSet(object):
     _managers = []
     exclude = []
 
+    links = None
+    default_global_link = "default_global"
+    default_instance_link = "default_instance"
+
     def __init__(self, name=None, model=None, template_dir=None, exclude=None):
+
+        self.links = {"default": []}
+        self.instance_links = {"default": []}
 
         if exclude:
             self.exclude = exclude
@@ -88,11 +95,11 @@ class ViewSet(object):
             self.base_url = "^%s/" % self.name
 
         self.views = SortedDict((
-            ("create", (ViewSetCreateView, r'^create/$')),
-            ("update", (ViewSetUpdateView, r'^%supdate/$' % self.object_url)),
-            ("delete", (ViewSetDeleteView, r'^%sdelete/$' % self.object_url)),
-            ("detail", (ViewSetDetailView, r'^%s$' % self.object_url)),
-            ("list", (ViewSetListView, r'^$')),
+            ("create", (ViewSetCreateView, r'^create/$', [])),
+            ("update", (ViewSetUpdateView, r'^%supdate/$' % self.object_url, [])),
+            ("delete", (ViewSetDeleteView, r'^%sdelete/$' % self.object_url, [])),
+            ("detail", (ViewSetDetailView, r'^%s$' % self.object_url, [])),
+            ("list", (ViewSetListView, r'^$', [])),
         ))
 
         for name in self.exclude:
@@ -117,7 +124,8 @@ class ViewSet(object):
 
     def get_urls(self):
         urls = []
-        for name, (view_class, url_regex) in self.views.items():
+        print(self.views)
+        for name, (view_class, url_regex, links) in self.views.items():
             kwargs = {}
 
             # override here or these views can't be used elsewhere
@@ -147,6 +155,12 @@ class ViewSet(object):
                 else:
                     view.dispatch.__func__.csrf_exempt = True
 
+            for link in links:
+                if link in self.links:
+                    self.links[link].append(view)
+                else:
+                    self.links[link] = [view]
+
 #             view.name = name
 #             view.manager = self
             view = view.as_view(**kwargs)
@@ -164,7 +178,7 @@ class ViewSet(object):
     def get_queryset(self, view, request, **kwargs):
         return self.model.objects.all()
 
-    def register(self, name, url=None, ordering=0):
+    def register(self, name, url=None, ordering=0, links=None):
         """ use this to decorate your views """
 
         if not url:
@@ -173,17 +187,23 @@ class ViewSet(object):
             else:
                 url = r'^%s/$' % (name)
 
+        if links is None:
+            if "P<pk>" in url or "P<slug>" in url:
+                links = [self.default_instance_link]
+            else:
+                links = [self.default_global_link]
+
         def inner(view):
-            self.views[name] = (view, url)
+            self.views[name] = (view, url, links)
             self.views.keyOrder.remove(name)
             self.views.keyOrder.insert(ordering, name)
             return view
 
         return inner
 
-    def instance_view(self, name):
+    def instance_view(self, name, links=None):
         return self.register(name,
-            r'^%s%s/$' % (self.object_url, name))
+            r'^%s%s/$' % (self.object_url, name), links=links)
 
     def extra_context(self, request, view, **kwargs):
         return dict(
