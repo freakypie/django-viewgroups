@@ -2,6 +2,7 @@ from django.db.models.query_utils import Q
 import operator
 
 from viewsets.mixins.base import SessionDataMixin
+from six.moves import reduce
 
 
 class SearchMixin(SessionDataMixin):

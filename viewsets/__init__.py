@@ -124,7 +124,7 @@ class ViewSet(object):
 
     def get_urls(self):
         urls = []
-        print(self.views)
+
         for name, (view_class, url_regex, links) in self.views.items():
             kwargs = {}
 
