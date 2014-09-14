@@ -161,6 +161,8 @@ class ViewSet(object):
                 else:
                     self.links[link] = [view]
 
+            print(name, view, parents)
+
 #             view.name = name
 #             view.manager = self
             view = view.as_view(**kwargs)

@@ -52,6 +52,7 @@ class AutocompleteListView(AutocompleteMixin, ListView):
 
 
 class ActionListView(ActionMixin, ListView):
+    page_kwarg = 'page'
 
     def paginate_queryset(self, queryset, page_size):
         paginator = self.get_paginator(queryset, page_size, allow_empty_first_page=self.get_allow_empty())
