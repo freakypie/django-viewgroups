@@ -1,6 +1,6 @@
 from django.core.urlresolvers import reverse
 from django.db.models.fields.related import ReverseSingleRelatedObjectDescriptor
-from django.utils.encoding import StrAndUnicode
+from django.utils.encoding import python_2_unicode_compatible
 from django.utils.safestring import mark_safe
 
 from viewsets.mixins.base import SessionDataMixin
@@ -9,7 +9,8 @@ from django.db.models.fields import FieldDoesNotExist
 from django.utils.html import escapejs, escape
 
 
-class Header(StrAndUnicode):
+@python_2_unicode_compatible
+class Header(object):
 
     def __init__(self, title, sort_field=None, sorting=0, link=None, sort_name="sort"):
         self.title = title
@@ -32,7 +33,7 @@ class Header(StrAndUnicode):
 
         return mark_safe(retval)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.link_tag
 
 
