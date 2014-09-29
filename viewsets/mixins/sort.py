@@ -30,8 +30,7 @@ class Header(object):
                 retval = '<a href="?%s=">%s <i class="glyphicon glyphicon-chevron-up"></i></a>' % (self.sort_name, self.title)
         else:
             retval = self.title
-
-        return mark_safe(retval)
+        return retval
 
     def __str__(self):
         return self.link_tag
@@ -62,8 +61,9 @@ class SortMixin(SessionDataMixin):
         if queryset is None:
             queryset = super(SortMixin, self).get_queryset(queryset)
 
+        sort_fields = self.ordering
         sort_terms = self.get_sort_fields()
-        if sort_terms:
+        if sort_terms and sort_terms == ":default:":
             allowed_fields = list(self.get_allowed_sort_fields(queryset.model))
 
             sort_fields = []
@@ -78,8 +78,6 @@ class SortMixin(SessionDataMixin):
 
                 if sort in allowed_fields:
                     sort_fields.append(desc and "-" + sort or sort)
-        else:
-            sort_fields = self.ordering
 
         if sort_fields:
             self.sorting_fields = sort_fields

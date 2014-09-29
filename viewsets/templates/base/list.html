@@ -11,7 +11,7 @@ $(function() {
         $("input[name={{ selected_name }}]").prop("checked", this.checked);
     });
     $("input[name={{ selected_name }}]").click(function () {
-        $(".all").prop('checked', $("input[name={{ selected_name }}]").length == 
+        $(".all").prop('checked', $("input[name={{ selected_name }}]").length ==
             $("input[name={{ selected_name }}]:checked").length);
     });
 });
@@ -71,11 +71,11 @@ $(function() {
         {% endfor %}
         </div>
         {% endif %}
-        
+
         {% if search %}
         <form class="navbar-form navbar-left">
             <div class="form-group">
-                <input class="form-control" name="{{ search }}" value="{{ query }}" 
+                <input class="form-control" name="{{ search }}" value="{{ query }}"
                     type="text" placeholder="Search Terms...">
             </div>
             <button class="btn btn-default">Search</button>
@@ -106,10 +106,10 @@ $(function() {
                     </th>
                     {% endif %}
                     {% for header in headers %}
-                    <th>{{ header }}</th>
+                    <th>{{ header|safe }}</th>
                     {% endfor %}
                 </tr>
-            </thead>            
+            </thead>
             {% for object, row in rows %}
             <tr>
                 {% if actions %}
@@ -119,7 +119,7 @@ $(function() {
                 <td>{{ cell }}</td>
                 {% endfor %}
             </tr>
-            {% endfor %}            
+            {% endfor %}
         </table>
         {% else %}
         {% if request.META.QUERY_STRING %}
@@ -130,7 +130,7 @@ $(function() {
           {% endblock list_empty %}
         {% endif %}
         {% endif %}
-    {% else %}    
+    {% else %}
         {% if object_list %}
         <table class="table table-striped table-bordered">
             {% block list_detail_header %}{% endblock list_detail_header %}
@@ -153,9 +153,9 @@ $(function() {
         {% endif %}
     {% endif %}
     {% endblock list_detail %}
-    
+
     {% if object_list and actions %}
-    <div class="navbar navbar-default">    
+    <div class="navbar navbar-default">
         <div class="navbar-form">
             <div class="form-group">
                 {% csrf_token %}
