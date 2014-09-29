@@ -284,7 +284,7 @@ class TableMixin(SortMixin):
         list_display_links = self.get_list_display_links()
         for name, cell in self.get_cells(obj, list_display):
             if name in list_display_links:
-                cell = "<a href='{}'>{}</a>".format(self.get_detail_link(obj), cell)
+                cell = u"<a href='{}'>{}</a>".format(self.get_detail_link(obj), cell)
 
             yield mark_safe(cell)
 
@@ -294,9 +294,9 @@ class TableMixin(SortMixin):
                 retval = field.value(obj)
             except Exception as ex:
                 print (type(ex), ex)
-                retval = "<i style='color:darkred;' " + \
-                    "class='glyphicon glyphicon-exclamation-sign' " + \
-                    "title='{}: {}'></i>".format(type(ex).__name__, escape(str(ex)))
+                retval = u"<i style='color:darkred;' " + \
+                    u"class='glyphicon glyphicon-exclamation-sign' " + \
+                    u"title='{}: {}'></i>".format(type(ex).__name__, escape(str(ex)))
 
             if retval is None:
                 retval = "_"
