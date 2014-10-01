@@ -72,8 +72,8 @@ class ViewSet(object):
 
     def __init__(self, name=None, model=None, template_dir=None, exclude=None):
 
-        self.links = {"default": []}
-        self.instance_links = {"default": []}
+        self.links = {self.default_global_link: []}
+        self.instance_links = {self.default_instance_link: []}
 
         if exclude:
             self.exclude = exclude
@@ -94,13 +94,24 @@ class ViewSet(object):
         if self.base_url is None:
             self.base_url = "^%s/" % self.name
 
-        self.views = SortedDict((
-            ("create", (ViewSetCreateView, r'^create/$', [])),
-            ("update", (ViewSetUpdateView, r'^%supdate/$' % self.object_url, [])),
-            ("delete", (ViewSetDeleteView, r'^%sdelete/$' % self.object_url, [])),
-            ("detail", (ViewSetDetailView, r'^%s$' % self.object_url, [])),
-            ("list", (ViewSetListView, r'^$', [])),
-        ))
+        self.views = SortedDict()
+
+        for name, view in (
+            ("create", ViewSetCreateView),
+            ("update", ViewSetUpdateView),
+            ("delete", ViewSetDeleteView),
+            ("detail", ViewSetDetailView),
+            ("list", ViewSetListView)
+        ):
+            if name not in self.exclude:
+                if name in ("update", "delete", ):
+                    self.instance_view(name)(view)
+                elif name in ("list", ):
+                    self.register(name, url=r'^$', links=[])(view)
+                elif name in ("detail", ):
+                    self.register(name, url=r'^%s$' % self.object_url)(view)
+                else:
+                    self.register(name)(view)
 
         for name in self.exclude:
             del self.views[name]
@@ -160,8 +171,6 @@ class ViewSet(object):
                     self.links[link].append(view)
                 else:
                     self.links[link] = [view]
-
-            print(name, view, parents)
 
 #             view.name = name
 #             view.manager = self

@@ -23,7 +23,6 @@ class SessionDataMixin(object):
             # clear
             cleared = False
             if "_" in items:
-                print("data cleared")
                 data = {}
                 cleared = True
             items.pop("_", None)
@@ -31,11 +30,8 @@ class SessionDataMixin(object):
             if len(items.keys()) > 0 or cleared:
                 for n, v in items.items():
                     data[n] = v
-                print("Saved session", data)
                 self.request.session[prefix] = data
 
             self.___stored_data = data
-
-        print("data", prefix, data)
 
         return data.copy()
