@@ -96,22 +96,22 @@ class ViewSet(object):
 
         self.views = SortedDict()
 
-        for name, view in (
+        for ordering, (name, view) in enumerate((
+            ("list", ViewSetListView),
             ("create", ViewSetCreateView),
-            ("update", ViewSetUpdateView),
-            ("delete", ViewSetDeleteView),
             ("detail", ViewSetDetailView),
-            ("list", ViewSetListView)
-        ):
+            ("update", ViewSetUpdateView),
+            ("delete", ViewSetDeleteView)
+        )):
             if name not in self.exclude:
                 if name in ("update", "delete", ):
-                    self.instance_view(name)(view)
+                    self.instance_view(name, ordering=ordering)(view)
                 elif name in ("list", ):
-                    self.register(name, url=r'^$', links=[])(view)
+                    self.register(name, url=r'^$', ordering=ordering, links=[])(view)
                 elif name in ("detail", ):
-                    self.register(name, url=r'^%s$' % self.object_url)(view)
+                    self.register(name, url=r'^%s$' % self.object_url, links=[])(view)
                 else:
-                    self.register(name)(view)
+                    self.register(name, ordering=ordering)(view)
 
         for name in self.exclude:
             del self.views[name]
@@ -212,9 +212,9 @@ class ViewSet(object):
 
         return inner
 
-    def instance_view(self, name, links=None):
+    def instance_view(self, name, ordering=0, links=None):
         return self.register(name,
-            r'^%s%s/$' % (self.object_url, name), links=links)
+            r'^%s%s/$' % (self.object_url, name), ordering=ordering, links=links)
 
     def extra_context(self, request, view, **kwargs):
         return dict(
