@@ -8,9 +8,15 @@
 
 {% block header %}{{ object|default:"Nameless" }}{% endblock header %}
 
-{% block links %} 
-<a href="{% url 'base:list' %}" class="btn">View All {{ opts.verbose_name_plural.title }}</a>
-<a href="{% url 'base:update' object|pkslug %}" class="btn btn-info">Update</a>
-<a href="{% url 'base:delete' object|pkslug %}" class="btn btn-danger">Delete</a> 
+{% block links %}
+    <a href="{% url 'base:list' %}" class="btn">View All {{ opts.verbose_name_plural.title }}</a>
+    {% for link in manager.links.default_instance %}
+        {% url manager.name|add:':'|add:link.name pk=object.pk as url %}
+        {% if url %}
+            <a class="btn btn-default" href="{{ url }}">{{ link.get_title }}</a>
+        {% else %}
+            {{ manager.name|add:':'|add:link.name }} is not a valid url
+        {% endif %}
+    {% endfor %}
 {% endblock %}
 
