@@ -120,7 +120,7 @@ class TableField(object):
 class UnicodeTableField(TableField):
 
     def valid(self):
-        return self.field == "__unicode__"
+        return self.field == "__unicode__" or self.field == "__str__"
 
     def header(self):
         try:
