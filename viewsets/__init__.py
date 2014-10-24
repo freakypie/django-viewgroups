@@ -113,9 +113,6 @@ class ViewSet(object):
                 else:
                     self.register(name, ordering=ordering)(view)
 
-        for name in self.exclude:
-            del self.views[name]
-
         if template_dir:
             self.template_dir = template_dir
         elif not self.template_dir:
