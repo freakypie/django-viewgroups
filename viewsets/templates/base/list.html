@@ -126,7 +126,7 @@
                          search</em></div>
             {% else %}
                 {% block list_empty %}
-                    <div><em>Sorry, there are no {{ opts.verbose_name }} at this
+                    <div><em>Sorry, there are no {{ opts.verbose_name_plural }} at this
                              time.</em></div>
                 {% endblock list_empty %}
             {% endif %}
@@ -150,7 +150,7 @@
                 <div><em>No {{ opts.verbose_name_plural }} match your
                          search</em></div>
             {% else %}
-                <div><em>Sorry, there are no {{ opts.verbose_name }} at this
+                <div><em>Sorry, there are no {{ opts.verbose_name_plural }} at this
                          time.</em></div>
             {% endif %}
         {% endif %}
