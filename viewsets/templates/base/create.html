@@ -1,22 +1,23 @@
 {% extends "base/base.html" %}
+{% load i18n %}
 {% load url from future %}
 {% load crispy_forms_tags %}
 {% load form_tags %}
 
 
-{% block title %}Create {{ opts.verbose_name.title }}{% endblock title %}
+{% block title %}{% blocktrans with vn_title=opts.verbose_name.title %}Create {{ vn_title }}{% endblocktrans %}{% endblock title %}
 
 
-{% block header %}Create {{ opts.verbose_name.title }}{% endblock header %}
+{% block header %}{% blocktrans with vn_title=opts.verbose_name.title %}Create {{ vn_title }}{% endblocktrans %}{% endblock header %}
 
 {% block links %}
-    <a class="btn" href="..">Back</a>
+    <a class="btn" href="..">{% trans 'Back' %}</a>
 {% endblock links %}
 
 {% block detail %}
     <form class="form-horizontal" action="." enctype="multipart/form-data" method="post">{% csrf_token %}
         {% block form %}
-            {% form_helper form=form button="Save" as helper %}
+            {% form_helper form=form button=_("Save") as helper %}
             {% crispy form helper %}
         {% endblock form %}
 
@@ -57,7 +58,7 @@
                 var add_url = $(this).attr("data-add-url");
                 if (add_url) {
                     options.formatNoMatches = function (term) {
-                        return 'No maches found. <a target="_blank" href="' + add_url + '">Create `' + term + '`</a>';
+                        return 'No maches found. <a target="_blank" href="' + add_url + '">{% trans 'Create' %} `' + term + '`</a>';
                     }
                 }
 

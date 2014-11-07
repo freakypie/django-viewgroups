@@ -1,4 +1,5 @@
 {% extends "base/base.html" %}
+{% load i18n %}
 {% load url from future %}
 {% load viewgroups_tags humanize %}
 
@@ -28,7 +29,7 @@
         {% if url %}
             <a class="btn btn-default" href="{{ url }}">{{ link.get_title }}</a>
         {% else %}
-            {{ manager.name|add:':'|add:link.name }} is not a valid url
+            {% blocktrans with link_name=manager.name|add:':'|add:link.name %}{{ link_name }} is not a valid url{% endblocktrans %}
         {% endif %}
     {% endfor %}
 {% endblock %}
@@ -72,15 +73,14 @@
                                name="{{ search }}"
                                value="{{ query }}"
                                type="text"
-                               placeholder="Search Terms...">
+                               placeholder="{% trans 'Search Terms...' %}">
                     </div>
-                    <button class="btn btn-default">Search</button>
+                    <button class="btn btn-default">{% trans 'Search' %}</button>
                 </form>
             {% endif %}
             {% if search or filters %}
                 <p class="navbar-text">
-                    <a href="?_">{{ original_queryset.count|intcomma }}
-                        Total</a>
+                    <a href="?_">{% blocktrans with qs_count=original_queryset.count|intcomma %}{{ qs_count }} Total{% endblocktrans %}</a>
                 </p>
             {% endif %}
         </div>
@@ -122,12 +122,18 @@
             </table>
         {% else %}
             {% if request.META.QUERY_STRING %}
-                <div><em>No {{ opts.verbose_name_plural }} match your
-                         search</em></div>
+                <div>
+                  <em>
+                    {% blocktrans with vnp=opts.verbose_name_plural %}No {{ vnp }} match your search{% endblocktrans %}
+                  </em>
+                </div>
             {% else %}
                 {% block list_empty %}
-                    <div><em>Sorry, there are no {{ opts.verbose_name_plural }} at this
-                             time.</em></div>
+                    <div>
+                      <em>
+                        {% blocktrans with vnp=opts.verbose_name_plural %}Sorry, there are no {{ vnp }} at this time.{% endblocktrans %}
+                      </em>
+                    </div>
                 {% endblock list_empty %}
             {% endif %}
         {% endif %}
@@ -147,11 +153,17 @@
             </table>
         {% else %}
             {% if request.META.QUERY_STRING %}
-                <div><em>No {{ opts.verbose_name_plural }} match your
-                         search</em></div>
+                <div>
+                  <em>
+                    {% blocktrans with vnp=opts.verbose_name_plural %}No {{ vnp }} match your search{% endblocktrans %}
+                  </em>
+                </div>
             {% else %}
-                <div><em>Sorry, there are no {{ opts.verbose_name_plural }} at this
-                         time.</em></div>
+                    <div>
+                      <em>
+                        {% blocktrans with vnp=opts.verbose_name_plural %}Sorry, there are no {{ vnp }} at this time.{% endblocktrans %}
+                      </em>
+                    </div>
             {% endif %}
         {% endif %}
     {% endif %}

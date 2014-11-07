@@ -2,6 +2,7 @@ from django.core.urlresolvers import reverse
 from django.db.models.fields.related import ReverseSingleRelatedObjectDescriptor
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.safestring import mark_safe
+from django.utils.translation import ugettext as _
 
 from viewsets.mixins.base import SessionDataMixin
 import six
@@ -13,7 +14,10 @@ from django.utils.html import escapejs, escape
 class Header(object):
 
     def __init__(self, title, sort_field=None, sorting=0, link=None, sort_name="sort"):
-        self.title = title
+        if title:
+            self.title = _(title)
+        else:
+            self.title = title
         self.sort_field = sort_field
         self.sorting = sorting
         self.link = link

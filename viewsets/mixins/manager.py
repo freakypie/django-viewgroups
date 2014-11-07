@@ -1,18 +1,19 @@
 from copy import deepcopy
 from django.core.urlresolvers import reverse
+from django.utils.translation import ugettext_lazy as _
 from viewsets.views import SearchMixin
 import os
 
 from viewsets.mixins.filter import FilterMixin
 from viewsets.mixins.sort import SortMixin, TableMixin
-from django.utils.functional import lazy
 
 
 class ViewSetMixin(object):
     list_detail_link = "base:detail"
 
     def get_title(self):
-        return self.name.replace("-", " ").title()
+        title = self.name.replace("-", " ").title()
+        return _(title)  # gettext won't find the strings so they need manual entry into the .po file
 
     def get_context_data(self, **kwargs):
         context = super(ViewSetMixin, self).get_context_data(**kwargs)

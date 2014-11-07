@@ -5,6 +5,7 @@ from django.forms.models import modelform_factory, inlineformset_factory, \
 from django.template.loader import render_to_string
 from django.contrib.contenttypes.generic import generic_inlineformset_factory
 from django.shortcuts import redirect
+from django.utils.translation import ugettext_lazy as _
 
 
 class Inline(object):
@@ -45,7 +46,8 @@ class Inline(object):
         form = self.get_form_class(self.request, self.instance)()
 
         for field in form.visible_fields():
-            yield field.name.replace("_", " ").title()
+            name = field.name.replace("_", " ").title()
+            yield _(name)
 
     def prepare(self, request, instance):
         self.request = request
@@ -88,7 +90,8 @@ class GenericInline(Inline):
             exclude=self.exclude_names)()
 
         for field in form.visible_fields():
-            yield field.name.replace("_", " ").title()
+            name = field.name.replace("_", " ").title()
+            yield _(name)
 
 
 class FormsetInline(Inline):
@@ -104,7 +107,8 @@ class FormsetInline(Inline):
             exclude=self.exclude_names)()
 
         for field in form.visible_fields():
-            yield field.name.replace("_", " ").title()
+            name = field.name.replace("_", " ").title()
+            yield _(name)
 
     def create_formset(self, args, instance, formset_class):
         self.formset = formset_class(*args, queryset=self.model.objects.none())

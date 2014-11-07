@@ -1,5 +1,6 @@
 from django.core.paginator import InvalidPage
 from django.http import HttpResponse, Http404
+from django.utils.translation import ugettext_lazy as _
 from django.views.generic.base import View, TemplateView
 from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.list import ListView, MultipleObjectMixin
@@ -184,4 +185,3 @@ class MultipleFormDetailView(SingleObjectMixin, MultipleFormView):
             object=self.object,
             **kwargs
         )
-

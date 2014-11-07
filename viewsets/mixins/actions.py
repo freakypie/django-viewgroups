@@ -2,6 +2,7 @@ from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.utils.datastructures import SortedDict
 from django.utils.encoding import force_text
+from django.utils.translation import ugettext_lazy as _
 
 
 class ActionMixin(object):
@@ -28,7 +29,7 @@ class ActionMixin(object):
             "queryset": queryset,
             "opts": queryset.model._meta
         })
-    delete_selected.short_description = "Delete selected %(verbose_name_plural)s"
+    delete_selected.short_description = _("Delete selected %(verbose_name_plural)s")
 
     def get_actions(self):
         return self.actions
