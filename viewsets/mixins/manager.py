@@ -10,8 +10,11 @@ from django.utils.functional import lazy
 
 class ViewSetMixin(object):
     list_detail_link = "base:detail"
+    title = None
 
     def get_title(self):
+        if self.title:
+           return self.title
         return self.name.replace("-", " ").title()
 
     def get_context_data(self, **kwargs):
