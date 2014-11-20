@@ -65,6 +65,7 @@ class ViewSet(object):
     default_app = "base"
     _managers = []
     exclude = []
+    ordering = 0
 
     links = None
     default_global_link = "default_global"
@@ -122,10 +123,25 @@ class ViewSet(object):
 
     @classproperty
     @classmethod
-    def managers(klass):
+    def _get_managers(klass):
+        retval = []
         for m in klass._managers:
             if isinstance(m, klass):
-                yield m
+                retval.append(m)
+        return retval
+
+    @classproperty
+    @classmethod
+    def managers(klass):
+        return sorted(klass._get_managers, key=lambda a: (a.ordering, a.name))
+
+    @classproperty
+    @classmethod
+    def managers_by_app(cls):
+        return sorted(
+            cls._get_managers,
+            key=lambda a: (a.model._meta.app_label, a.ordering, a.name)
+        )
 
     def pre_dispatch(self, request, view, **kwargs):
         pass
