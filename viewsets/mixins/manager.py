@@ -1,6 +1,5 @@
 from copy import deepcopy
 from django.core.urlresolvers import reverse
-from django.utils.translation import ugettext_lazy as _
 from viewsets.views import SearchMixin
 import os
 
@@ -17,7 +16,7 @@ class ViewSetMixin(object):
             title = self.title
         else:
             title = self.name.replace("-", " ").title()
-        return _(title)  # gettext won't find the strings so they need manual entry into the .po file
+        return title
 
     def get_context_data(self, **kwargs):
         context = super(ViewSetMixin, self).get_context_data(**kwargs)
