@@ -17,7 +17,7 @@ class Header(object):
         if title:
             self.title = _(title)
         else:
-            self.title = title
+            self.title = ""
         self.sort_field = sort_field
         self.sorting = sorting
         self.link = link
@@ -300,7 +300,7 @@ class TableMixin(SortMixin):
                 cell = u"<a href='{}'>{}</a>".format(self.get_detail_link(obj), escape(cell))
                 yield mark_safe(cell)
             else:
-                yield mark_safe(escape(cell))
+                yield cell
 
     def get_cells(self, obj, list_display):
         for field in list_display:
