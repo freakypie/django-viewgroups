@@ -5,7 +5,6 @@ import os
 
 from viewsets.mixins.filter import FilterMixin
 from viewsets.mixins.sort import SortMixin, TableMixin
-from django.utils.functional import lazy
 
 
 class ViewSetMixin(object):
@@ -14,8 +13,10 @@ class ViewSetMixin(object):
 
     def get_title(self):
         if self.title:
-           return self.title
-        return self.name.replace("-", " ").title()
+            title = self.title
+        else:
+            title = self.name.replace("-", " ").title()
+        return title
 
     def get_context_data(self, **kwargs):
         context = super(ViewSetMixin, self).get_context_data(**kwargs)

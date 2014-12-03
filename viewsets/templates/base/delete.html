@@ -1,24 +1,25 @@
 {% extends "base/base.html" %}
+{% load i18n %}
 {% load url from future %}
 
 
-{% block title %}Delete {{ object|default:"Nameless" }}{% endblock title %}
+{% block title %}{% blocktrans with obj=object|default:_("Nameless") %}Delete {{ obj }}{% endblocktrans %}{% endblock title %}
 
 
-{% block header %}Delete {{ object|default:"Nameless" }}{% endblock header %}
+{% block header %}{% blocktrans with obj=object|default:_("Nameless") %}Delete {{ obj }}{% endblocktrans %}{% endblock header %}
 
 {% block links %} 
-<a href="{% url 'base:detail' object.pk %}" class="btn">View {{ object|default:"Nameless" }}</a> 
-<a href="{% url 'base:list' %}" class="btn">View All {{ opts.verbose_name_plural.title }}</a>
+<a href="{% url 'base:detail' object.pk %}" class="btn">{% blocktrans with obj=object|default:_("Nameless") %}View {{ obj }}{% endblocktrans %}</a> 
+<a href="{% url 'base:list' %}" class="btn">{% blocktrans with vnp_title=opts.verbose_name_plural.title %}View All {{ vnp_title }}{% endblocktrans %}</a>
 {% endblock %}
 
 
 {% block detail %}
 
-<p>Are you sure you want to delete {{ object }}?</p>
+<p>{% blocktrans %}Are you sure you want to delete {{ object }}?{% endblocktrans %}</p>
 <form action="." method="post">{% csrf_token %}
-    <button class="btn btn-danger"><i class="icon icon-white icon-remove"></i> Yes Delete!</button>
+    <button class="btn btn-danger"><i class="icon icon-white icon-remove"></i> {% trans 'Yes Delete!' %}</button>
 </form>
-<a href="{% url 'base:detail' object.pk %}" class="btn">No! I changed my mind.</a>
+<a href="{% url 'base:detail' object.pk %}" class="btn">{% trans 'No! I changed my mind.' %}</a>
 
 {% endblock detail %}

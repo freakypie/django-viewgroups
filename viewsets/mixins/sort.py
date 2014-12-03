@@ -2,6 +2,7 @@ from django.core.urlresolvers import reverse
 from django.db.models.fields.related import ReverseSingleRelatedObjectDescriptor
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.safestring import mark_safe
+from django.utils.translation import ugettext as _
 
 from viewsets.mixins.base import SessionDataMixin
 import six
@@ -13,7 +14,10 @@ from django.utils.html import escapejs, escape
 class Header(object):
 
     def __init__(self, title, sort_field=None, sorting=0, link=None, sort_name="sort"):
-        self.title = title
+        if title:
+            self.title = _(title)
+        else:
+            self.title = ""
         self.sort_field = sort_field
         self.sorting = sorting
         self.link = link
@@ -23,14 +27,18 @@ class Header(object):
     def link_tag(self):
         if self.sort_field:
             if self.sorting == 0:
-                retval = '<a href="?%s=%s">%s</a>' % (self.sort_name, self.sort_field, self.title)
+                retval = '<a href="?%s=%s">%s</a>' % (self.sort_name, self.sort_field, self.proper_title)
             elif self.sorting == 1:
-                retval = '<a href="?%s=-%s">%s <i class="glyphicon glyphicon-chevron-down"></i></a>' % (self.sort_name, self.sort_field, self.title)
+                retval = '<a href="?%s=-%s">%s <i class="glyphicon glyphicon-chevron-down"></i></a>' % (self.sort_name, self.sort_field, self.proper_title)
             else:
-                retval = '<a href="?%s=">%s <i class="glyphicon glyphicon-chevron-up"></i></a>' % (self.sort_name, self.title)
+                retval = '<a href="?%s=">%s <i class="glyphicon glyphicon-chevron-up"></i></a>' % (self.sort_name, self.proper_title)
         else:
-            retval = self.title
+            retval = self.proper_title
         return retval
+
+    @property
+    def proper_title(self):
+        return self.title.replace('_', ' ')
 
     def __str__(self):
         return self.link_tag
@@ -283,10 +291,16 @@ class TableMixin(SortMixin):
     def get_row(self, obj, list_display):
         list_display_links = self.get_list_display_links()
         for name, cell in self.get_cells(obj, list_display):
-            if name in list_display_links:
-                cell = u"<a href='{}'>{}</a>".format(self.get_detail_link(obj), cell)
+            if cell == '':
+                # if the the list_display_link is an empty string and it's the only one...
+                # it makes it impossible for a user to select fixing here by adding text.
+                cell = 'None'
 
-            yield mark_safe(cell)
+            if name in list_display_links:
+                cell = u"<a href='{}'>{}</a>".format(self.get_detail_link(obj), escape(cell))
+                yield mark_safe(cell)
+            else:
+                yield cell
 
     def get_cells(self, obj, list_display):
         for field in list_display:

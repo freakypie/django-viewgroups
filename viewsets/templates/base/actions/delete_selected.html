@@ -1,14 +1,15 @@
 {% extends "base.html" %}
+{% load i18n %}
 
 
 {% block content %}
 
 <form action="." method="post">{% csrf_token %}
     <input type="hidden" name="{{ action_name }}" value="{{ action }}">
-    <h2>Delete selected {{ opts.verbose_name_plural }}</h2>
-    <p>Are you sure you wish to delete these {{ opts.verbose_name_plural }}? ({{ queryset.count }})</p>
+    <h2>{% blocktrans with vnp=opts.verbose_name_plural %}Delete selected {{ vnp }}{% endblocktrans %}</h2>
+    <p>{% blocktrans with vnp=opts.verbose_name_plural %}Are you sure you wish to delete these {{ vnp }}?{% endblocktrans %} ({{ queryset.count }})</p>
     <div class="alert alert-danger">
-        <b>Warning!</b>: Related data that depends on these objects will also be deleted.
+        <b>{% trans 'Warning!' %}</b>: {% blocktrans %}Related data that depends on these objects will also be deleted.{% endblocktrans %}
     </div>
     <ul>{% for object in queryset %}
         <li>
@@ -16,8 +17,8 @@
             {{ object }}
         </li>{% endfor %}
     </ul>
-    <button class="btn btn-danger" name="confirmed" value="1">Delete them</button>
-    <a class="btn" href=".">Whoa!, don't do it!</a>
+    <button class="btn btn-danger" name="confirmed" value="1">{% trans 'Delete them' %}</button>
+    <a class="btn" href=".">{% trans "Whoa!, don't do it!" %}</a>
 </form>
 
 {% endblock content %}
