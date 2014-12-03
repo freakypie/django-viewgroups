@@ -10,6 +10,7 @@ from viewsets.mixins.sort import SortMixin, TableMixin
 
 class ViewSetMixin(object):
     list_detail_link = "base:detail"
+    title = None
 
     def get_title(self):
         title = self.name.replace("-", " ").title()
