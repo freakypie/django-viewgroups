@@ -13,7 +13,10 @@ class ViewSetMixin(object):
     title = None
 
     def get_title(self):
-        title = self.name.replace("-", " ").title()
+        if self.title:
+            title = self.title
+        else:
+            title = self.name.replace("-", " ").title()
         return _(title)  # gettext won't find the strings so they need manual entry into the .po file
 
     def get_context_data(self, **kwargs):
