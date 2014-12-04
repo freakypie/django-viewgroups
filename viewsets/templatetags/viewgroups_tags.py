@@ -58,7 +58,7 @@ def form_helper(
         helper.layout.fields.append(
             Div(
                 Div(
-                    StrictButton(button, type="submit"),
+                    StrictButton(button, css_class="btn btn-default", type="submit"),
                     css_class="col-md-{} col-md-offset-{}".format(
                         field_size, (label_size + label_offset)
                     )
