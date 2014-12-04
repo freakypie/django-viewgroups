@@ -1,21 +1,22 @@
 {% extends "base/base.html" %}
+{% load i18n %}
 {% load url from future %}
 {% load viewgroups_tags %}
 
 
-{% block title %}{{ object|default:"Nameless" }}{% endblock title %}
+{% block title %}{{ object|default:_("Nameless") }}{% endblock title %}
 
 
-{% block header %}{{ object|default:"Nameless" }}{% endblock header %}
+{% block header %}{{ object|default:_("Nameless") }}{% endblock header %}
 
 {% block links %}
-    <a href="{% url 'base:list' %}" class="btn">View All {{ opts.verbose_name_plural.title }}</a>
+    <a href="{% url 'base:list' %}" class="btn">{% blocktrans with vnp_title=opts.verbose_name_plural.title %}View All {{ vnp_title }}{% endblocktrans %}</a>
     {% for link in manager.links.default_instance %}
         {% url manager.name|add:':'|add:link.name pk=object.pk as url %}
         {% if url %}
             <a class="btn btn-{% if link.name == 'delete' %}danger{% else %}default{% endif %}" href="{{ url }}">{{ link.get_title }}</a>
         {% else %}
-            {{ manager.name|add:':'|add:link.name }} is not a valid url
+            {% blocktrans with link_name=manager.name|add:':'|add:link.name %}{{ link_name }} is not a valid url{% endblocktrans %}
         {% endif %}
     {% endfor %}
 {% endblock %}

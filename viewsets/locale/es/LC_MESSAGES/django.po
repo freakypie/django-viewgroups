@@ -1,0 +1,164 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# Bryson Thornock <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2014-11-06 14:31-0600\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+
+# Manual Entries
+msgid "List"
+msgstr "Ver todos"
+
+msgid "Create"
+msgstr "Crear"
+
+msgid "Detail"
+msgstr "Detalle"
+
+msgid "Update"
+msgstr "Actualizar"
+
+msgid "Delete"
+msgstr "Eliminar"
+
+#: mixins/actions.py:32
+#, fuzzy, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "Eliminar los %(verbose_name_plural)s"
+
+#: templates/base/actions/delete_selected.html:9
+#, fuzzy, python-format
+msgid "Delete selected %(vnp)s"
+msgstr "Eliminar lo seleccionado %(vnp)s"
+
+#: templates/base/actions/delete_selected.html:10
+#, fuzzy, python-format
+msgid "Are you sure you wish to delete these %(vnp)s?"
+msgstr "¿Estás seguro que quieres eliminar los %(vnp)s?"
+
+#: templates/base/actions/delete_selected.html:12
+msgid "Warning!"
+msgstr "¡Atención!"
+
+#: templates/base/actions/delete_selected.html:12
+msgid "Related data that depends on these objects will also be deleted."
+msgstr "Información que tiene que ver con estos objetos, también se borrarán."
+
+#: templates/base/actions/delete_selected.html:20
+msgid "Delete them"
+msgstr "Elimínelos"
+
+#: templates/base/actions/delete_selected.html:21
+msgid "Whoa!, don't do it!"
+msgstr "No los borres"
+
+#: templates/base/base.html:17
+msgid "No details"
+msgstr "Sin detalles"
+
+#: templates/base/create.html:8 templates/base/create.html.py:11
+#, fuzzy, python-format
+msgid "Create %(vn_title)s"
+msgstr "Crear %(vn_title)s"
+
+#: templates/base/create.html:14
+msgid "Back"
+msgstr "Atrás"
+
+#: templates/base/create.html:20
+msgid "Save"
+msgstr "Guardar"
+
+#: templates/base/delete.html:6 templates/base/delete.html.py:9
+#: templates/base/delete.html:12 templates/base/detail.html:7
+#: templates/base/detail.html.py:10
+msgid "Nameless"
+msgstr "Sin Nombre"
+
+#: templates/base/delete.html:6 templates/base/delete.html.py:9
+#, fuzzy, python-format
+msgid "Delete %(obj)s"
+msgstr "Eliminar: %(obj)s"
+
+#: templates/base/delete.html:12
+#, fuzzy, python-format
+msgid "View %(obj)s"
+msgstr "Ver: %(obj)s"
+
+#: templates/base/delete.html:13 templates/base/detail.html:13
+#, fuzzy, python-format
+msgid "View All %(vnp_title)s"
+msgstr "Ver %(vnp_title)s"
+
+#: templates/base/delete.html:19
+#, python-format
+msgid "Are you sure you want to delete %(object)s?"
+msgstr "¿Seguro que quieres eliminar %(object)s?"
+
+#: templates/base/delete.html:21
+msgid "Yes Delete!"
+msgstr "¡Sí, elimínalos!"
+
+#: templates/base/delete.html:23
+msgid "No! I changed my mind."
+msgstr "No, me equivoqué."
+
+#: templates/base/detail.html:19 templates/base/list.html:32
+#, fuzzy, python-format
+msgid "%(link_name)s is not a valid url"
+msgstr "%(link_name)s no existe"
+
+#: templates/base/list.html:76
+msgid "Search Terms..."
+msgstr "Buscar..."
+
+#: templates/base/list.html:78
+msgid "Search"
+msgstr "Buscar"
+
+#: templates/base/list.html:83
+#, python-format
+msgid "%(qs_count)s Total"
+msgstr "%(qs_count)s en total"
+
+#: templates/base/list.html:127 templates/base/list.html.py:158
+#, fuzzy, python-format
+msgid "No %(vnp)s match your search"
+msgstr "No hay resultados para %(vnp)s"
+
+#: templates/base/list.html:134 templates/base/list.html.py:164
+#, fuzzy, python-format
+msgid "Sorry, there are no %(vnp)s at this time."
+msgstr "No hay resultados por ahora para %(vnp)s."
+
+#: templates/base/update.html:6 templates/base/update.html.py:9
+#, python-format
+msgid "Edit: %(object)s"
+msgstr "Editar: %(object)s"
+
+#: templates/base/update.html:12
+#, fuzzy, python-format
+msgid "Save %(vn_title)s"
+msgstr "Guardar %(vn_title)s"
+
+#: templates/forms/tabular_inline.html:14
+msgid "Delete?"
+msgstr "¿Eliminar?"
+
+#: views.py:68
+msgid "Page is not 'last', nor can it be converted to an int."
+msgstr "La página ni es 'última', ni se puede volverse en número."

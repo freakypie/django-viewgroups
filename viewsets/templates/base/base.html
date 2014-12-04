@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load url from future %}
+{% load i18n %}
 
 {% block breadcrumbs %}
 
@@ -13,7 +14,7 @@
 <h2>{% block header %}{{ opts.verbose_name.title }}{% endblock header %}</h2>
 
 {% block detail %}
-No details
+{% trans 'No details' %}
 {% endblock detail %}
 
 {% endblock content %}

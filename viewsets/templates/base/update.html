@@ -1,11 +1,12 @@
 {% extends "base/create.html" %}
 {% load url from future %}
+{% load i18n %}
 
 
-{% block title %}Edit: {{ object }}{% endblock title %}
+{% block title %}{% blocktrans %}Edit: {{ object }}{% endblocktrans %}{% endblock title %}
 
 
-{% block header %}Edit: {{ object }}{% endblock header %}
+{% block header %}{% blocktrans %}Edit: {{ object }}{% endblocktrans %}{% endblock header %}
 
 
-{% block button-text %}Save {{ opts.verbose_name.title }}{% endblock button-text %}
+{% block button-text %}{% blocktrans with vn_title=opts.verbose_name.title %}Save {{ vn_title }}{% endblocktrans %}{% endblock button-text %}
