@@ -54,7 +54,7 @@ class ViewSet(object):
     PK_URL = "(?P<pk>\d+)/"
     SLUG_URL = "(?P<slug>[\w\-\d]+)/"
 
-    mixin = None
+    mixin = ViewSetMixin
     name = None
     model = None
     opts = None
