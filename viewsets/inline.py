@@ -135,14 +135,11 @@ class ModelFormWithInlinesView(CreateView):
             return self.new_object()
 
     def get(self, request, *args, **kwargs):
-        print "get!"
         self.object = self.get_object()
         self.created = self.object.id is None
 
         form_class = self.get_form_class()
-        print form_class
         form = self.get_form(form_class)
-        print form
 
         inlines = self.get_inlines()
         [k.prepare(self.request, self.object) for k in inlines]
