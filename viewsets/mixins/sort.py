@@ -1,3 +1,4 @@
+from __future__ import print_function
 from django.core.urlresolvers import reverse
 from django.db.models.fields.related import ReverseSingleRelatedObjectDescriptor
 from django.utils.encoding import python_2_unicode_compatible
@@ -71,9 +72,9 @@ class SortMixin(SessionDataMixin):
 
         sort_fields = self.ordering
         sort_terms = self.get_sort_fields()
-        if sort_terms and sort_terms == ":default:":
-            allowed_fields = list(self.get_allowed_sort_fields(queryset.model))
 
+        if sort_terms:
+            allowed_fields = list(self.get_allowed_sort_fields(queryset.model))
             sort_fields = []
             for sort in sort_terms:
                 sort = sort.strip()
