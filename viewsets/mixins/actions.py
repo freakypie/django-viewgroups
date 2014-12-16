@@ -5,6 +5,10 @@ from django.utils.encoding import force_text
 from django.utils.translation import ugettext_lazy as _
 
 
+class NoActionFound(Exception):
+    pass
+
+
 class ActionMixin(object):
     """
     allows the view to perform actions on list items
@@ -34,18 +38,21 @@ class ActionMixin(object):
     def get_actions(self):
         return self.actions
 
+    def get_action(self, name):
+        if callable(action):
+            return action.__name__, action
+        elif hasattr(self, action):
+            return action, getattr(self, action)
+        else:
+            raise NoActionFound()
+
     def prepare_actions(self):
         self.action_list = SortedDict()
         for action in self.get_actions():
-            if callable(action):
-                slug = action.__name__
-                func = action
-            elif hasattr(self, action):
-                slug = action
-                func = getattr(self, action)
-            else:
-                continue
-
+            try:
+                slug, func = self.get_action(action)
+            except NoActionFound:
+                contine
             if hasattr(func, "short_description"):
                 title = func.short_description % {
                     "verbose_name": force_text(self.model._meta.verbose_name),

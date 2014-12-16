@@ -92,8 +92,15 @@ class ViewSetMixin(object):
             getattr(self.manager, "search_fields", [])
 
     def get_actions(self):
-        return super(ViewSetMixin, self).get_actions() or \
+        retval = super(ViewSetMixin, self).get_actions() or \
             getattr(self.manager, "actions", [])
+        return retval
+
+    def get_action(self, name):
+        if hasattr(self.manager, name):
+            return name, getattr(self.manager, name)
+        else:
+            return super(ViewSetMixin, self).get_action(name)
 
     def get_queryset(self):
         qs = self.manager.get_queryset(self, self.request, **self.kwargs)

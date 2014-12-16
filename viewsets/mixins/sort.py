@@ -308,9 +308,9 @@ class TableMixin(SortMixin):
                 retval = field.value(obj)
             except Exception as ex:
                 print (type(ex), ex)
-                retval = u"<i style='color:darkred;' " + \
+                retval = mark_safe(u"<i style='color:darkred;' " + \
                     u"class='glyphicon glyphicon-exclamation-sign' " + \
-                    u"title='{}: {}'></i>".format(type(ex).__name__, escape(str(ex)))
+                    u"title='{}: {}'></i>".format(type(ex).__name__, escape(str(ex))))
 
             if retval is None:
                 retval = "_"
