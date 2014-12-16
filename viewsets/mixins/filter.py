@@ -190,10 +190,19 @@ class FilterMixin(SessionDataMixin):
             remove = []
 
         p = dict(self.request.GET.items())
+
+        # clear out an special commands prefixed with "_"
+        for item in filter(lambda k: k.startswith("_"), p.keys()):
+            del p[item]
+
+        removed = []
         for r in remove:
             for k in p.keys():
                 if k.startswith(r):
                     del p[k]
+                    removed.append(k)
+        if removed:
+            p['_remove'] = ",".join(removed)
 
         for k, v in new_params.items():
             if v is None:
