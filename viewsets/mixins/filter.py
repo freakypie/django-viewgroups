@@ -1,3 +1,7 @@
+from urlparse import parse_qs
+from itertools import groupby
+from operator import itemgetter
+
 from django.contrib.admin.filters import SimpleListFilter, FieldListFilter,\
     ListFilter
 from django.contrib.admin.options import IncorrectLookupParameters
@@ -8,8 +12,6 @@ from django.db import models
 from django.utils.http import urlencode
 from viewsets.mixins.base import SessionDataMixin
 from django.contrib.contenttypes.models import ContentType
-from itertools import groupby
-from operator import itemgetter
 
 
 class QuerysetListFilter(SimpleListFilter):
@@ -34,7 +36,7 @@ class QuerysetListFilter(SimpleListFilter):
 class GenericQuerysetListFilter(ListFilter):
     ct_field = "content_type"
     fk_field = "object_id"
-    
+
     def __init__(self, request, params, model, model_admin):
         super(GenericQuerysetListFilter, self).__init__(
             request, params, model, model_admin)
@@ -47,10 +49,10 @@ class GenericQuerysetListFilter(ListFilter):
             if param in params:
                 value = params.pop(param)
                 self.used_parameters[param] = value
-                        
+
     def get_base_queryset(self, request, model_admin):
         raise NotImplemented
-     
+
     def get_choices_queryset(self, request, model_admin):
         qs = self.get_base_queryset(request, model_admin)\
             .distinct()\
@@ -66,7 +68,7 @@ class GenericQuerysetListFilter(ListFilter):
         for ct, pks in self.get_choices_queryset(request, model_admin):
             pks = [obj[self.fk_field] for obj in pks]
             if ct:
-                qs = ContentType.objects.get_for_id(ct).get_all_objects_for_this_type(pk__in=pks)                
+                qs = ContentType.objects.get_for_id(ct).get_all_objects_for_this_type(pk__in=pks)
                 for obj in qs:
                     yield (ct, obj.pk, self.get_choice_label(obj))
             else:
@@ -77,7 +79,7 @@ class GenericQuerysetListFilter(ListFilter):
             return queryset.filter(**self.used_parameters)
         except ValidationError as e:
             raise IncorrectLookupParameters(e)
-       
+
     def choices(self, cl):
         yield {
             'selected': len(self.used_parameters.keys()) == 0,
@@ -85,32 +87,30 @@ class GenericQuerysetListFilter(ListFilter):
             'display': 'All',
         }
         for ct, lookup, title in self.lookup_choices:
-            if ct is None:            
+            if ct is None:
                 lookup_dict = {
                     self.ct_field + "__isnull": "True",
                     self.fk_field + "__isnull": "True"
                 }
-                remove = [self.ct_field + "__exact", self.fk_field + "__exact"]
             else:
                 lookup_dict = {
                     self.ct_field + "__exact": str(ct),
                     self.fk_field + "__exact": str(lookup)
                 }
-                remove = [self.ct_field + "__isnull", self.fk_field + "__isnull"]
             yield {
                 'selected': self.used_parameters == lookup_dict,
-                'query_string': cl.get_query_string(lookup_dict, remove),
+                'query_string': cl.get_query_string(lookup_dict, []),
                 'display': title,
-            }            
+            }
 
     def expected_parameters(self):
         return [self.ct_field + "__exact", self.fk_field + "__exact",
             self.ct_field + "__isnull", self.fk_field + "__isnull"]
-            
+
     def has_output(self):
         return len(self.lookup_choices) > 0
-                
-                
+
+
 class FakeRequest(object):
 
     def __init__(self, request, **kwargs):
@@ -224,7 +224,23 @@ class FilterMixin(SessionDataMixin):
 
         for f in self.filters:
             queryset = f.queryset(self.request, queryset)
-            f.items = f.choices(self)
+            f.items = list(f.choices(self))
+
+            # add in all possible removes
+            # to be able to clear the session data
+            remove_keys = set()
+            for item in f.items:
+                if "_remove=" not in f.items:
+                    for key in parse_qs(item['query_string'].strip("?")).keys():
+                        remove_keys.add(key)
+
+            for item in f.items:
+                if "_remove=" not in f.items:
+                    if not item['query_string'].endswith("?"):
+                        item['query_string'] += "&"
+                    item['query_string'] += "_remove={}".format(
+                        ",".join(remove_keys)
+                    )
 
         return queryset
 

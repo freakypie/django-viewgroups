@@ -22,17 +22,20 @@ class SessionDataMixin(object):
 
             # clear
             cleared = False
-            if "_clear" in items:
-                data = {}
-                cleared = True
-                items.pop("_clear", None)
+            for key in ("_clear", "_"):
+                if key in items:
+                    data = {}
+                    cleared = True
+                    items.pop(key, None)
+                    break
 
             # remove specific keys
             if "_remove" in items:
                 for remove in items.get("_remove", "").split(","):
                     if remove in data:
                         del data[remove]
-                items.pop("_clear", None)
+                        cleared = True
+                items.pop("_remove", None)
 
             if len(items.keys()) > 0 or cleared:
                 for n, v in items.items():
