@@ -39,10 +39,10 @@ class ActionMixin(object):
         return self.actions
 
     def get_action(self, name):
-        if callable(action):
-            return action.__name__, action
-        elif hasattr(self, action):
-            return action, getattr(self, action)
+        if callable(name):
+            return name.__name__, name
+        elif hasattr(self, name):
+            return name, getattr(self, name)
         else:
             raise NoActionFound()
 
@@ -52,7 +52,7 @@ class ActionMixin(object):
             try:
                 slug, func = self.get_action(action)
             except NoActionFound:
-                contine
+                continue
             if hasattr(func, "short_description"):
                 title = func.short_description % {
                     "verbose_name": force_text(self.model._meta.verbose_name),
