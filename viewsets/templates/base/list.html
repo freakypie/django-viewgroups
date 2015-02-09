@@ -145,7 +145,11 @@
                     {% block list_detail_item %}
                         <tr>
                             <td>
+                                {% if manager.views.detail %}
                                 <a href="{% url 'base:detail' object|pkslug %}">{{ object }}</a>
+                                {% else %}
+                                {{ object }}
+                                {% endif %} 
                             </td>
                         </tr>
                     {% endblock %}
