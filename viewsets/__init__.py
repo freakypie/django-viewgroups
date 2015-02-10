@@ -38,7 +38,7 @@ class ViewSetDeleteView(ViewSetMixin, DeleteView):
 
 
 class ViewSetListView(ViewSetMixin, AdminListView):
-    paginate_by = 25
+    pass
 
 
 class ViewSetDetailView(ViewSetMixin, DetailView):

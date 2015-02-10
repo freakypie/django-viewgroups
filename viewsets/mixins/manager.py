@@ -10,6 +10,7 @@ from viewsets.mixins.sort import SortMixin, TableMixin
 class ViewSetMixin(object):
     list_detail_link = "base:detail"
     title = None
+    paginate_by = None
 
     def get_title(self):
         if self.title:
@@ -17,6 +18,9 @@ class ViewSetMixin(object):
         else:
             title = self.name.replace("-", " ").title()
         return title
+
+    def get_paginate_by(self, queryset):
+        return getattr(self.manager, "paginate_by", self.paginate_by)
 
     def get_context_data(self, **kwargs):
         context = super(ViewSetMixin, self).get_context_data(**kwargs)
