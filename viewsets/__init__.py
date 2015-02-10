@@ -92,8 +92,7 @@ class ViewSet(object):
 
         self.name = slugify(self.name)
 
-        if self.base_url is None:
-            self.base_url = "^%s/" % self.name
+        base_url = self.get_base_url()
 
         self.views = SortedDict()
 
@@ -120,6 +119,9 @@ class ViewSet(object):
             self.template_dir = self.name
 
         ViewSet._managers.append(self)
+
+    def get_base_url(self):
+        return self.base_url or "{}/".format(self.name)
 
     @classproperty
     @classmethod
@@ -196,7 +198,7 @@ class ViewSet(object):
     def all_urls(klass):
         urls = []
         for m in klass.managers:
-            urls.append((m.base_url, include(m.get_urls())))
+            urls.append((m.get_base_url(), include(m.get_urls())))
         return patterns('', *urls)
 
     def get_queryset(self, view, request, **kwargs):
