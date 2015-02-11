@@ -66,6 +66,7 @@ class ViewSet(object):
     _managers = []
     exclude = []
     ordering = 0
+    paginate_by = 25
 
     links = None
     default_global_link = "default_global"
