@@ -105,11 +105,11 @@ class ViewSet(object):
             ("delete", ViewSetDeleteView)
         )):
             if name not in self.exclude:
-                if name in ("update", "delete", ):
+                if name in ("update", "delete",):
                     self.instance_view(name, ordering=ordering)(view)
-                elif name in ("list", ):
+                elif name in ("list",):
                     self.register(name, url=r'^$', ordering=ordering, links=[])(view)
-                elif name in ("detail", ):
+                elif name in ("detail",):
                     self.register(name, url=r'^%s$' % self.object_url, links=[])(view)
                 else:
                     self.register(name, ordering=ordering)(view)
@@ -182,6 +182,16 @@ class ViewSet(object):
                 else:
                     view.dispatch.__func__.csrf_exempt = True
 
+            # allow setting initialization args, kwargs
+            args = getattr(view, 'initargs', None)
+            initkwargs = getattr(view, 'initkwargs', None)
+
+            if not isinstance(args, (list, tuple)):
+                args = tuple()
+
+            if isinstance(initkwargs, dict):
+                kwargs.update(initkwargs)
+
             for link in links:
                 if link in self.links:
                     self.links[link].append(view)
@@ -190,7 +200,7 @@ class ViewSet(object):
 
 #             view.name = name
 #             view.manager = self
-            view = view.as_view(**kwargs)
+            view = view.as_view(*args, **kwargs)
             urls.append((url_regex, view, {}, name))
 
         return patterns('', *urls), self.default_app, self.name
