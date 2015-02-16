@@ -122,7 +122,7 @@ class ViewSet(object):
         ViewSet._managers.append(self)
 
     def get_base_url(self):
-        return self.base_url or "{}/".format(self.name)
+        return self.base_url or "^{}/".format(self.name)
 
     @classproperty
     @classmethod
