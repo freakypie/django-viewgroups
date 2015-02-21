@@ -123,7 +123,7 @@ class TableField(object):
         return None
 
     def value(self, instance):
-        return unicode(instance)
+        return six.text_type(instance)
 
 
 class UnicodeTableField(TableField):
