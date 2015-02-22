@@ -92,6 +92,7 @@
 
 
 {% block list_detail %}
+    <div class="table-responsive">
     {% if headers and rows %}
         {% if object_list %}
             <table class="table table-striped">
@@ -171,6 +172,7 @@
             {% endif %}
         {% endif %}
     {% endif %}
+    </div>
 {% endblock list_detail %}
 
 {% if object_list and actions %}
