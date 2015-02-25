@@ -2,7 +2,7 @@ from six.moves.urllib.parse import parse_qs
 from itertools import groupby
 from operator import itemgetter
 
-from django.contrib.admin.filters import SimpleListFilter, FieldListFilter,\
+from django.contrib.admin.filters import SimpleListFilter, FieldListFilter, \
     ListFilter
 from django.contrib.admin.options import IncorrectLookupParameters
 from django.contrib.admin.util import get_fields_from_path
@@ -192,12 +192,12 @@ class FilterMixin(SessionDataMixin):
         p = dict(self.request.GET.items())
 
         # clear out an special commands prefixed with "_"
-        for item in filter(lambda k: k.startswith("_"), p.keys()):
+        for item in filter(lambda k: k.startswith("_"), p.copy().keys()):
             del p[item]
 
         removed = []
         for r in remove:
-            for k in p.keys():
+            for k in p.copy().keys():
                 if k.startswith(r):
                     del p[k]
                     removed.append(k)
