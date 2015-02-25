@@ -16,6 +16,10 @@ you'll have to write your own. You can copy the templates/base/ directory
 in viewsets to your own project and modify them as needed,
 or make your own from scratch.
 
+Django Viewgroups also relies on `django-crispy-forms`. If you don't plan on
+overriding the templates, you'll want to install that as well.
+
+
 # Getting Started
 
 Import ViewSet to make a basic set of views for a particular model
@@ -24,7 +28,7 @@ Import ViewSet to make a basic set of views for a particular model
     
     pizza_viewset = ViewSet(model=Pizza)
 
-    # or
+    # or preferably
 
     class PizzaViewSet(ViewSet):
         model = Pizza
@@ -76,3 +80,15 @@ the template structure. For instance, if you want to link to a pizza's detail pa
     {% url 'pizzas:detail' %}
 
 If you create a custom view, just use the name you register the view with.
+
+
+# Inline forms
+
+You can also use our built in Inline views for more complex forms. 
+Use the `ModelFormWithInlinesView` view and give it a list of Inlines.
+
+    @pizza_viewset.register("create")
+    class TestToppingsInline(ModelFormWithInlinesView):
+        inlines = [Inline(Toppings)]
+        
+The Inline object can be subclassed for custom functionality.
