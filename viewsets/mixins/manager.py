@@ -106,8 +106,18 @@ class ViewSetMixin(object):
         else:
             return super(ViewSetMixin, self).get_action(name)
 
-    def get_queryset(self):
+    def get_queryset(self, request=None):
+        """
+        gets queryset from manager,
+        accepts request to be compatible with admin filters
+        """
         qs = self.manager.get_queryset(self, self.request, **self.kwargs)
+
+        # if request is passed, this is an admin filter
+        # and it will do filtering separately
+        if request:
+            return qs
+
         if isinstance(self, FilterMixin):
             qs = self.get_filtered_queryset(qs)
         if isinstance(self, SearchMixin):
