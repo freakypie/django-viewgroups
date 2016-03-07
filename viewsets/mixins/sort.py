@@ -138,7 +138,7 @@ class UnicodeTableField(TableField):
             return ""
 
     def sort(self):
-        return ":default:"
+        return ""
 
 
 class CallableTableField(TableField):
