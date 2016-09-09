@@ -23,10 +23,12 @@ class NoDetailMixin(object):
 
 
 class ViewSetCreateView(ViewSetMixin, CreateView):
+    fields = '__all__'
     pass
 
 
 class ViewSetUpdateView(ViewSetMixin, UpdateView):
+    fields = '__all__'
     pass
 
 
