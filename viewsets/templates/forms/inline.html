@@ -1,0 +1,26 @@
+{% load crispy_forms_tags %}
+
+<style>
+    .form-inline .controls {
+        display: inline-block;
+    }
+    .empty-form {
+        display: none;
+    }
+</style>
+
+<div class="form-inline">
+    <fieldset>
+        <legend>{{ inline.opts.verbose_name_plural.title }}</legend>
+        {{ inline.formset.management_form }}
+        {{ inline.formset.non_form_errors }}
+        <div class="empty-form">
+            {% crispy inline.formset.empty_form %}
+        </div>
+        {% for form in inline.formset.forms %}
+        <div class="form">
+            {% crispy form %}
+        </div>
+        {% endfor %}
+    </fieldset>
+</div>

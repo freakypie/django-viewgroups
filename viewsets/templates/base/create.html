@@ -15,11 +15,15 @@
 {% endblock links %}
 
 {% block detail %}
-    <form class="form-horizontal" action="." enctype="multipart/form-data" method="post">{% csrf_token %}
+    <form action="." enctype="multipart/form-data" method="post">
+        {% csrf_token %}
+
+        <div class="form-horizontal">
         {% block form %}
             {% form_helper form=form button=_("Save") as helper %}
             {% crispy form helper %}
         {% endblock form %}
+        </div>
 
         {% for inline in inlines %}
             {{ inline }}
