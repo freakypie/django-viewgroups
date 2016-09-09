@@ -4,10 +4,10 @@ from django.template.defaultfilters import slugify
 from django.utils.datastructures import SortedDict
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from viewsets.views import FilterMixin, SearchMixin, AdminListView
+from .views import AdminListView
 import six
 
-from viewsets.mixins.manager import ViewSetMixin
+from .mixins.manager import ViewSetMixin
 
 
 class NoDetailMixin(object):
