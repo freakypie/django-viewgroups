@@ -1,19 +1,13 @@
-from copy import copy, deepcopy
-from django.conf import settings
 from django.conf.urls import patterns, include
 from django.core.urlresolvers import reverse
-from django.shortcuts import redirect
 from django.template.defaultfilters import slugify
 from django.utils.datastructures import SortedDict
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from django.views.generic.list import ListView
 from viewsets.views import FilterMixin, SearchMixin, AdminListView
-import os
 import six
 
 from viewsets.mixins.manager import ViewSetMixin
-from viewsets.mixins.sort import SortMixin
 
 
 class NoDetailMixin(object):
@@ -24,12 +18,10 @@ class NoDetailMixin(object):
 
 class ViewSetCreateView(ViewSetMixin, CreateView):
     fields = '__all__'
-    pass
 
 
 class ViewSetUpdateView(ViewSetMixin, UpdateView):
     fields = '__all__'
-    pass
 
 
 class ViewSetDeleteView(ViewSetMixin, DeleteView):
