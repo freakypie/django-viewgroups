@@ -5,10 +5,10 @@ from django.utils.encoding import python_2_unicode_compatible
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 
-from viewsets.mixins.base import SessionDataMixin
+from .base import SessionDataMixin
 import six
 from django.db.models.fields import FieldDoesNotExist
-from django.utils.html import escapejs, escape
+from django.utils.html import escape
 
 
 @python_2_unicode_compatible

@@ -10,7 +10,7 @@ from django.contrib.admin.views.main import IGNORED_PARAMS
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.http import urlencode
-from viewsets.mixins.base import SessionDataMixin
+from .base import SessionDataMixin
 from django.contrib.contenttypes.models import ContentType
 
 
