@@ -12,7 +12,7 @@
         {{ inline.formset.management_form }}
         {{ inline.formset.non_form_errors }}
         <div class="empty-form">
-            {% crispy inline.formset.empty_form %}
+            {{ inline.formset.empty_form|crispy }}
         </div>
         <div class="forms">
             {% for form in inline.formset.forms %}
