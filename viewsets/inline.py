@@ -121,6 +121,7 @@ class ModelFormWithInlinesView(CreateView):
     otherwise an object will be created
     """
     inlines = []
+    fields = '__all__'
 
     def get_inlines(self):
         return self.inlines
