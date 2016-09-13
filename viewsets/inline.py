@@ -15,7 +15,7 @@ class Inline(object):
     form_class = None
     formset_class = None
 
-    def __init__(self, model, form=None, template="forms/tabular_inline.html",
+    def __init__(self, model, form=None, template="forms/inline.html",
         **kwargs):
 
         self.model = model
@@ -121,6 +121,7 @@ class ModelFormWithInlinesView(CreateView):
     otherwise an object will be created
     """
     inlines = []
+    fields = '__all__'
 
     def get_inlines(self):
         return self.inlines

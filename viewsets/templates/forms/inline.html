@@ -1,0 +1,26 @@
+{% load crispy_forms_tags %}
+
+<style>
+    .empty-form {
+        display: none;
+    }
+</style>
+
+<div class="form-inline">
+    <fieldset>
+        <legend>{{ inline.opts.verbose_name_plural.title }}</legend>
+        {{ inline.formset.management_form }}
+        {{ inline.formset.non_form_errors }}
+        <div class="empty-form">
+            {{ inline.formset.empty_form|crispy }}
+        </div>
+        <div class="forms">
+            {% for form in inline.formset.forms %}
+            <div class="form">
+                {{ form|crispy }}
+            </div>
+            {% endfor %}
+        </div>
+    </fieldset>
+    <button class="btn btn-default add-more"><span class="glyphicon glyphicon-plus"></span></button>
+</div>

@@ -1,8 +1,5 @@
 from django import forms
-from django.utils.encoding import force_unicode
-from django.forms.util import flatatt
-from django.utils.safestring import mark_safe
-from viewsets.widgets import AutocompleteWidget
+from .widgets import AutocompleteWidget
 
 
 class AutocompleteField(forms.ModelChoiceField):

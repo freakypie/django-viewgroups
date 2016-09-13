@@ -1,10 +1,10 @@
 from copy import deepcopy
 from django.core.urlresolvers import reverse
-from viewsets.views import SearchMixin
+from ..views import SearchMixin
 import os
 
-from viewsets.mixins.filter import FilterMixin
-from viewsets.mixins.sort import SortMixin, TableMixin
+from .filter import FilterMixin
+from .sort import SortMixin, TableMixin
 
 
 class ViewSetMixin(object):
