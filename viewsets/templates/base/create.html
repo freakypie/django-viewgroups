@@ -20,14 +20,20 @@
 
         <div class="form-horizontal">
         {% block form %}
+            {% if not inlines %}
             {% form_helper form=form button=_("Save") as helper %}
             {% crispy form helper %}
+            {% else %}
+            {% form_helper form=form as helper %}
+            {% crispy form helper %}
+            {% endif %}
         {% endblock form %}
         </div>
 
         {% for inline in inlines %}
             {{ inline }}
         {% endfor %}
+
         {% if inlines %}
         <script>
             $(function(){
@@ -48,6 +54,8 @@
                 });
             });
         </script>
+
+        <input type="submit" class="btn btn-primary pull-right" value="Save" />
         {% endif %}
     </form>
 {% endblock detail %}
