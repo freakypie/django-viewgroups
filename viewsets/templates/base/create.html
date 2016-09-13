@@ -7,7 +7,6 @@
 
 {% block title %}{% blocktrans with vn_title=opts.verbose_name.title %}Create {{ vn_title }}{% endblocktrans %}{% endblock title %}
 
-
 {% block header %}{% blocktrans with vn_title=opts.verbose_name.title %}Create {{ vn_title }}{% endblocktrans %}{% endblock header %}
 
 {% block links %}
@@ -35,26 +34,6 @@
         {% endfor %}
 
         {% if inlines %}
-        <script>
-            $(function(){
-                $('.form-inline > .add-more').click(function(event){
-                    event.preventDefault();
-                    var $inline_form = $(this).parent();
-                    var $total_forms = $inline_form.find('[name*="TOTAL_FORMS"]');
-                    var form_idx = $total_forms.val();
-                    var $empty_form = $inline_form.find('.empty-form');
-                    var $forms_list = $inline_form.find('.forms');
-                    console.log($forms_list[0]);
-                    $forms_list.append(
-                        $empty_form.clone().removeClass('empty-form').addClass('form').html(
-                            $empty_form.html().replace(/__prefix__/g, form_idx)
-                        )
-                    );
-                    $total_forms.val(parseInt(form_idx) + 1);
-                });
-            });
-        </script>
-
         <input type="submit" class="btn btn-primary pull-right" value="Save" />
         {% endif %}
     </form>
@@ -66,7 +45,8 @@
 {% endblock extrastyles %}
 
 
-{% block extrascripts %}
+{% block extra_scripts %}
+    {{ block.super }}
     <script src="{{ STATIC_URL }}select2/select2.js"></script>
     <script src="{{ STATIC_URL }}scripts/jquery.formset.min.js"></script>
     <script>
@@ -138,4 +118,26 @@
             $(".select2").each(setupSelect2);
         })
     </script>
-{% endblock extrascripts %}
+
+    {% if inlines %}
+    <script>
+        $(function(){
+            $('.form-inline > .add-more').click(function(event){
+                event.preventDefault();
+                var $inline_form = $(this).parent();
+                var $total_forms = $inline_form.find('[name*="TOTAL_FORMS"]');
+                var form_idx = $total_forms.val();
+                var $empty_form = $inline_form.find('.empty-form');
+                var $forms_list = $inline_form.find('.forms');
+                console.log($forms_list[0]);
+                $forms_list.append(
+                    $empty_form.clone().removeClass('empty-form').addClass('form').html(
+                        $empty_form.html().replace(/__prefix__/g, form_idx)
+                    )
+                );
+                $total_forms.val(parseInt(form_idx) + 1);
+            });
+        });
+    </script>
+    {% endif %}
+{% endblock extra_scripts %}

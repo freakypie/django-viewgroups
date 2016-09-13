@@ -4,7 +4,7 @@
 {% load viewgroups_tags humanize %}
 
 
-{% block extrascripts %}
+{% block extra_scripts %}
     {{ block.super }}
     <script>
         $(function () {
@@ -17,7 +17,7 @@
             });
         });
     </script>
-{% endblock extrascripts %}
+{% endblock extra_scripts %}
 
 
 {% block header %}{{ opts.verbose_name_plural.title }}{% endblock header %}
