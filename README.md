@@ -1,3 +1,6 @@
+# Moved
+https://github.com/freakypie/django-viewgroups
+
 # Pre-requisites
 
 The Default templates assume bootstrap3 and font-awesome, if you don't want to use
