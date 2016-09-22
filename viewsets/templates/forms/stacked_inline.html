@@ -1,9 +1,9 @@
 <div class="inline form-horizontal">
     <fieldset>
-        <legend>{{ inline.opts.verbose_name_plural.title }}</legend>
-        {{ inline.formset.management_form }}
-        {{ inline.formset.non_form_errors }}
-        <div class="form">{% for form in inline.formset.forms %}
+        <legend>{{ title }}</legend>
+        {{ formset.management_form }}
+        {{ formset.non_form_errors }}
+        <div class="form">{% for form in formset.forms %}
              {% include 'forms/bootstrap.html' %}{% endfor %}
         </div>
     </fieldset>
