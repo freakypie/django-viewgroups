@@ -79,6 +79,7 @@ class Inline(object):
             {
                 "formset": self.formset,
                 "title": self.opts.verbose_name_plural.title,
+                "inline": self,
             }
         )
 
