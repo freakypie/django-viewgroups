@@ -1,17 +1,11 @@
 {% load crispy_forms_tags %}
 
-<style>
-    .empty-form {
-        display: none;
-    }
-</style>
-
-<div class="form-inline">
+<div class="inline form-inline">
     <fieldset>
         <legend>{{ title }}</legend>
         {{ formset.management_form }}
         {{ formset.non_form_errors }}
-        <div class="empty-form">
+        <div class="hidden empty-form">
             {{ formset.empty_form|crispy }}
         </div>
         <div class="forms">

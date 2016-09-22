@@ -1,31 +1,12 @@
 {% load i18n %}
+{% load viewgroups_tags %}
+{% load crispy_forms_tags %}
+
 <div class="inline form-horizontal">
-    <div class="col-lg-2">
-        <h3 class="control-label">{{ inline.opts.verbose_name_plural }}</h3>
-    </div>
-    <div class="col-lg-10">
-        {{ inline.formset.errors }}
-	    {{ inline.formset.management_form }}
-	    {{ inline.formset.non_form_errors }}
-	    <table id="{{ inline.opts.object_name }}-inline" class="table table-striped">
-	        <thead>
-	            <tr>{% for header in inline.get_headers %}
-	                <th>{{ header }}</th>{% endfor %}
-	                <th>{% trans 'Delete?' %}</th>
-	            </tr>
-	        </thead>
-	        <tbody>{% for form in inline.formset.forms %}
-	            <tr>{% for field in form.visible_fields %}
-	                <td>
-	                    {% if forloop.counter == 1 %}
-	                        {% for field in form.hidden_fields %}
-	                            {{ field }}
-	                        {% endfor %}
-	                    {% endif %}
-	                    {{ field }}
-	                </td>{% endfor %}
-	            </tr>{% endfor %}
-	        </tbody>
-	    </table>
-    </div>
+    <h3 class="control-label">{{ title }}</h3>
+    {% form_helper formset=formset as helper %}
+    {% crispy formset helper %}
+    {% block add-more-button %}
+    <button class="btn btn-default add-more glyphicon glyphicon-plus"></button>
+    {% endblock %}
 </div>

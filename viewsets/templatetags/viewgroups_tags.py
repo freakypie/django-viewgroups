@@ -36,7 +36,9 @@ def form_helper(
         form_tag=False,
         label_size=4,
         label_offset=0,
-        field_size=8):
+        field_size=8,
+        template=None,
+):
 
     helper = FormHelper()
     helper.form_tag = form_tag
@@ -53,6 +55,9 @@ def form_helper(
 
     if formset:
         helper.template = "bootstrap/table_inline_formset.html"
+
+    if template:
+        helper.template = template
 
     if form and button:
         helper.layout.fields.append(
