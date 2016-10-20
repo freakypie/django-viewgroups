@@ -1,5 +1,5 @@
 $(function(){
-    $('.form-inline > .add-more').click(function(event){
+    $('.inline > .add-more').click(function(event){
         event.preventDefault();
         var $inline_form = $(this).parent();
         var $total_forms = $inline_form.find('[name*="TOTAL_FORMS"]');
