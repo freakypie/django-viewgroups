@@ -87,6 +87,9 @@ If you create a custom view, just use the name you register the view with.
 You can also use our built in Inline views for more complex forms. 
 Use the `ModelFormWithInlinesView` view and give it a list of Inlines.
 
+
+    from viewsets.inline import ModelFormWithInlinesView, Inline
+
     @pizza_viewset.register("create")
     class TestToppingsInline(ModelFormWithInlinesView):
         inlines = [Inline(Toppings)]
