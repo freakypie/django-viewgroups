@@ -1,10 +1,26 @@
+{% load staticfiles %}
+
+<link rel="stylesheet" type="text/css" href="{% static "styles/inlines.css" %}" />
+
 <div class="inline form-horizontal">
     <fieldset>
-        <legend>{{ inline.opts.verbose_name_plural.title }}</legend>
-        {{ inline.formset.management_form }}
-        {{ inline.formset.non_form_errors }}
-        <div class="form">{% for form in inline.formset.forms %}
-             {% include 'forms/bootstrap.html' %}{% endfor %}
+        <legend>{{ title }}</legend>
+        {{ formset.management_form }}
+        {{ formset.non_form_errors }}
+        <div class="empty-form">
+            {% include 'forms/bootstrap.html' with form=formset.empty_form %}
+            <hr />
+        </div>
+        <div class="forms">
+            {% for form in formset.forms %}
+                <div class="form">
+                    {% include 'forms/bootstrap.html' %}
+                    <hr />
+                </div>
+            {% endfor %}
         </div>
     </fieldset>
+    {% block add-more-button %}
+    <button class="btn btn-default add-more glyphicon glyphicon-plus"></button>
+    {% endblock %}
 </div>
