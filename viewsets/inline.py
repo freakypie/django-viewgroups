@@ -74,7 +74,14 @@ class Inline(object):
             **self.formset_kwargs)
 
     def __unicode__(self):
-        return render_to_string(self.template, {"inline": self})
+        return render_to_string(
+            self.template,
+            {
+                "formset": self.formset,
+                "title": self.opts.verbose_name_plural.title,
+                "inline": self,
+            }
+        )
 
 
 class GenericInline(Inline):
