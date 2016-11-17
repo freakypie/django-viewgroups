@@ -1,10 +1,7 @@
 {% load i18n %}
 <div class="inline form-horizontal">
-    <div class="col-lg-2">
-        <h3 class="control-label">{{ title }}</h3>
-    </div>
-    <div class="col-lg-10">
-        {{ formset.errors }}
+    <h3>{{ title }}</h3>
+    <div class="forms">
         {{ formset.management_form }}
         {{ formset.non_form_errors }}
         <table id="{{ inline.opts.object_name }}-inline" class="table table-striped">
