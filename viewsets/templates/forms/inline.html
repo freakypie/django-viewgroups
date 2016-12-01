@@ -1,4 +1,7 @@
 {% load crispy_forms_tags %}
+{% load staticfiles %}
+
+<link rel="stylesheet" type="text/css" href="{% static "styles/inlines.css" %}" />
 
 <div class="inline form-inline">
     <fieldset>
@@ -7,11 +10,13 @@
         {{ formset.non_form_errors }}
         <div class="hidden empty-form">
             {{ formset.empty_form|crispy }}
+            <hr />
         </div>
         <div class="forms">
             {% for form in formset.forms %}
             <div class="form">
                 {{ form|crispy }}
+                <hr />
             </div>
             {% endfor %}
         </div>
