@@ -22,7 +22,13 @@
                             {% endfor %}
                         {% endif %}
                         {{ field }}
+                        {{ field.errors }}
                     </td>{% endfor %}
+                    {% if form.non_field_errors %}
+                    <td>
+                        {{ form.non_field_errors }}
+                    </td>
+                    {% endif %}
                 </tr>{% endfor %}
             </tbody>
         </table>
