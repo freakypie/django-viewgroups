@@ -14,6 +14,13 @@
                 </tr>
             </thead>
             <tbody>{% for form in formset.forms %}
+                {% if form.non_field_errors %}
+                <tr>
+                    <td colspan=100>
+                        {{ form.non_field_errors }}
+                    </td>
+                </tr>
+                {% endif %}
                 <tr>{% for field in form.visible_fields %}
                     <td>
                         {% if forloop.counter == 1 %}
@@ -22,6 +29,7 @@
                             {% endfor %}
                         {% endif %}
                         {{ field }}
+                        {{ field.errors }}
                     </td>{% endfor %}
                 </tr>{% endfor %}
             </tbody>
