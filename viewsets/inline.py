@@ -15,14 +15,17 @@ class Inline(object):
     form_class = None
     formset_class = None
 
-    def __init__(self, model, form=None, template="forms/inline.html",
-        **kwargs):
+    def __init__(
+        self, model, form=None, formset_class=None,
+        template="forms/inline.html", **kwargs
+    ):
 
         self.model = model
         self.opts = self.model._meta
         self.template = template
 
         self.form_class = form
+        self.formset_class = formset_class
         self.form_kwargs = self.form_kwargs.copy()
         self.formset_kwargs = self.formset_kwargs.copy()
         self.formset_kwargs.update(kwargs)
