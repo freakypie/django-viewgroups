@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='django-viewgroups',
-    version='0.1.27',
+    version='0.1.28',
     author='John Leith',
     author_email='leith.john@gmail.com',
     packages=find_packages(),
