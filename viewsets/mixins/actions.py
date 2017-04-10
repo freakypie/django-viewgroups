@@ -1,6 +1,7 @@
+from collections import OrderedDict as SortedDict
+
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
-from django.utils.datastructures import SortedDict
 from django.utils.encoding import force_text
 from django.utils.translation import ugettext_lazy as _
 

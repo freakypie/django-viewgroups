@@ -1,7 +1,7 @@
+from collections import OrderedDict as SortedDict
 from django.conf.urls import patterns, include
 from django.core.urlresolvers import reverse
 from django.template.defaultfilters import slugify
-from django.utils.datastructures import SortedDict
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from .views import AdminListView
