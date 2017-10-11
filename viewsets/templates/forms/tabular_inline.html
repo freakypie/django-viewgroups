@@ -1,30 +1,42 @@
 {% load i18n %}
 <div class="inline form-horizontal">
-    <div class="col-lg-2">
-        <h3 class="control-label">{{ title }}</h3>
-    </div>
-    <div class="col-lg-10">
-        {{ formset.management_form }}
-        {{ formset.non_form_errors }}
-        <table id="{{ inline.opts.object_name }}-inline" class="table table-striped">
-            <thead>
-                <tr>{% for header in inline.get_headers %}
-                    <th>{{ header }}</th>{% endfor %}
-                    <th>{% trans 'Delete?' %}</th>
-                </tr>
-            </thead>
-            <tbody>{% for form in formset.forms %}
-                <tr>{% for field in form.visible_fields %}
-                    <td>
-                        {% if forloop.counter == 1 %}
-                            {% for field in form.hidden_fields %}
-                                {{ field }}
-                            {% endfor %}
+    <div class="row">
+        <div class="col-lg-2">
+            <h3 class="control-label">{{ title }}</h3>
+        </div>
+        <div class="col-lg-10">
+            {{ formset.management_form }}
+            {{ formset.non_form_errors }}
+            <table id="{{ inline.opts.object_name }}-inline" class="table table-striped">
+                <thead>
+                    <tr>{% for header in inline.get_headers %}
+                        <th>{{ header }}</th>{% endfor %}
+                        {% if formset.can_delete %}
+                            <th>{% trans 'Delete?' %}</th>
                         {% endif %}
-                        {{ field }}
-                    </td>{% endfor %}
-                </tr>{% endfor %}
-            </tbody>
-        </table>
+                    </tr>
+                </thead>
+                <tbody>{% for form in formset.forms %}
+                    {% if form.non_field_errors %}
+                    <tr>
+                        <td colspan=100>
+                            {{ form.non_field_errors }}
+                        </td>
+                    </tr>
+                    {% endif %}
+                    <tr>{% for field in form.visible_fields %}
+                        <td>
+                            {% if forloop.counter == 1 %}
+                                {% for field in form.hidden_fields %}
+                                    {{ field }}
+                                {% endfor %}
+                            {% endif %}
+                            {{ field }}
+                            {{ field.errors }}
+                        </td>{% endfor %}
+                    </tr>{% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
