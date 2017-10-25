@@ -188,7 +188,10 @@ class ModelTableField(CallableTableField):
                 item = getattr(field, subfield, None)
 
                 if isinstance(item, ReverseSingleRelatedObjectDescriptor):
-                    item = item.get_queryset().model
+                    try:
+                        item = item.get_queryset().model
+                    except AttributeError:
+                        item = item.get_query_set().model
 
                 if not item:
                     try:
