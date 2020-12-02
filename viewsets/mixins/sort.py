@@ -1,14 +1,16 @@
 from __future__ import print_function
-from django.core.urlresolvers import reverse
-from django.db.models.fields.related import ReverseSingleRelatedObjectDescriptor
+
+import six
+from django.db.models.fields import FieldDoesNotExist
+from django.db.models.fields.related import \
+    ReverseSingleRelatedObjectDescriptor
+from django.urls import reverse
 from django.utils.encoding import python_2_unicode_compatible
+from django.utils.html import escape
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 
 from .base import SessionDataMixin
-import six
-from django.db.models.fields import FieldDoesNotExist
-from django.utils.html import escape
 
 
 @python_2_unicode_compatible

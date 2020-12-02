@@ -5,7 +5,6 @@ from operator import itemgetter
 from django.contrib.admin.filters import SimpleListFilter, FieldListFilter, \
     ListFilter
 from django.contrib.admin.options import IncorrectLookupParameters
-from django.contrib.admin.util import get_fields_from_path
 from django.contrib.admin.views.main import IGNORED_PARAMS
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -170,6 +169,7 @@ class FilterMixin(SessionDataMixin):
                         # the type of the given field.
                         field, field_list_filter_class = list_filter, FieldListFilter.create
                     if not isinstance(field, models.Field):
+                        from django.contrib.admin.util import get_fields_from_path
                         field_path = field
                         field = get_fields_from_path(self.model, field_path)[-1]
                     spec = field_list_filter_class(field, request, lookup_params,
