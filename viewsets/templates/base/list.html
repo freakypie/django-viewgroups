@@ -4,7 +4,7 @@
 {% load viewgroups_tags humanize %}
 
 
-{% block extrascripts %}
+{% block extra_scripts %}
     {{ block.super }}
     <script>
         $(function () {
@@ -17,7 +17,7 @@
             });
         });
     </script>
-{% endblock extrascripts %}
+{% endblock extra_scripts %}
 
 
 {% block header %}{{ opts.verbose_name_plural.title }}{% endblock header %}
@@ -150,7 +150,7 @@
                                 <a href="{% url 'base:detail' object|pkslug %}">{{ object }}</a>
                                 {% else %}
                                 {{ object }}
-                                {% endif %} 
+                                {% endif %}
                             </td>
                         </tr>
                     {% endblock %}
@@ -187,6 +187,10 @@
                 </select>
             </div>
             <button class="btn btn-default">Go</button>
+            <div class="form-group">
+              <input type="checkbox" name="select_across">
+              select across all pages ({{ page_obj.paginator.count|intcomma }} total)
+            </div>
         </div>
     </div>
     </form>

@@ -6,10 +6,10 @@ from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.list import ListView, MultipleObjectMixin
 import json
 
-from viewsets.mixins.actions import ActionMixin
-from viewsets.mixins.filter import FilterMixin
-from viewsets.mixins.search import SearchMixin
-from viewsets.mixins.sort import TableMixin
+from .mixins.actions import ActionMixin
+from .mixins.filter import FilterMixin
+from .mixins.search import SearchMixin
+from .mixins.sort import TableMixin
 
 
 class AutocompleteMixin(SearchMixin):

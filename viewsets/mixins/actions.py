@@ -1,6 +1,7 @@
+from collections import OrderedDict as SortedDict
+
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
-from django.utils.datastructures import SortedDict
 from django.utils.encoding import force_text
 from django.utils.translation import ugettext_lazy as _
 
@@ -78,6 +79,14 @@ class ActionMixin(object):
             actions=actions,
             **kwargs)
 
+    def get_action_queryset(self, action):
+        if self.request.POST.get("select_across"):
+            queryset = self.get_queryset()
+        else:
+            ids = self.request.POST.getlist(self.selected_name)
+            queryset = self.get_queryset().filter(id__in=ids)
+        return queryset
+
     def perform_action(self, action):
         """
         Executes the given action and Returns None or an HttpResponse
@@ -85,8 +94,10 @@ class ActionMixin(object):
         self.action_list = self.prepare_actions()
         if action and action in self.action_list:
             title, func = self.action_list.get(action)
-            ids = self.request.POST.getlist(self.selected_name)
-            queryset = self.get_queryset().filter(id__in=ids)
-            retval = func(self.request, queryset)
-            if isinstance(retval, HttpResponse):
-                return retval
+            queryset = self.get_action_queryset(action)
+            response = func(self.request, queryset)
+            if isinstance(response, HttpResponse):
+                response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+                response['Pragma'] = "no-cache"
+                response['Expires'] = 0
+                return response
