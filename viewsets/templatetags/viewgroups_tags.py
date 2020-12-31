@@ -28,7 +28,7 @@ def message_type_bootstraped(message_type):
     return message_type
 
 
-@register.assignment_tag()
+@register.simple_tag()
 def form_helper(
         button=None,
         form=None,

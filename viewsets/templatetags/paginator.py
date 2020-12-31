@@ -6,7 +6,7 @@ from django.core.paginator import Paginator, InvalidPage
 register = template.Library()
 
 
-@register.assignment_tag
+@register.simple_tag
 def paginate(request, queryset, per_page=25, page_var="page"):
     page = request.REQUEST.get(page_var, 1)
     try:

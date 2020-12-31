@@ -74,7 +74,7 @@ def line_has_errors(line):
     return False
 
 
-@register.assignment_tag()
+@register.simple_tag()
 def form_helper(
         button=None,
         form=None,

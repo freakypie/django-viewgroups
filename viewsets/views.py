@@ -5,7 +5,7 @@ import six
 from django.core.paginator import InvalidPage
 from django.http import Http404, HttpResponse
 from django.template.defaultfilters import slugify
-from django.urls import include, reverse
+from django.urls import include, path, re_path, reverse
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic.base import TemplateView, View
 from django.views.generic.detail import DetailView, SingleObjectMixin
@@ -379,7 +379,7 @@ class ViewSet(object):
 #             view.name = name
 #             view.manager = self
             view = view.as_view(*args, **kwargs)
-            urls.append((url_regex, view, {}, name))
+            urls.append(re_path(url_regex, view, {}, name))
 
         return urls, self.default_app, self.name
 
@@ -387,8 +387,8 @@ class ViewSet(object):
     def all_urls(klass):
         urls = []
         for m in klass.managers:
-            # TODO: urls.append((m.get_base_url(), include(m.get_urls())))
-            urls.append((m.get_base_url(), m.get_urls()))
+            patterns, app_name, namespace = m.get_urls()
+            urls.append(re_path(m.get_base_url(), include((patterns, app_name), namespace=namespace)))
         return urls
 
     def get_queryset(self, view, request, **kwargs):
