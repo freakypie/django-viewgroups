@@ -116,7 +116,6 @@ class FakeRequest(object):
         self.original_request = request
         self.user = request.user
         self.GET = request.GET
-        self.REQUEST = request.REQUEST
         self.POST = request.POST
         self.META = request.META
         for n, v in kwargs.items():

@@ -35,7 +35,8 @@ class ViewSetMixin(object):
     # need to set the current app for url namespace resolution
     def render_to_response(self, context, **response_kwargs):
         if getattr(self, "manager", None):
-            response_kwargs["current_app"] = self.manager.name
+            # response_kwargs["current_app"] = self.manager.name
+            self.request.current_app = self.manager.name
             context.update({"current_app": self.manager.name})
 
         return super(ViewSetMixin, self).render_to_response(context, **response_kwargs)
@@ -86,7 +87,7 @@ class ViewSetMixin(object):
 
     def get_list_display_links(self):
         return super(ViewSetMixin, self).get_list_display_links() or \
-            getattr(self.manager, "list_display_links", ["__unicode__"])
+            getattr(self.manager, "list_display_links", ["__str__"])
 
     def get_list_filters(self):
         return super(ViewSetMixin, self).get_list_filters() or \

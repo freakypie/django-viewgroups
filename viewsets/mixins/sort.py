@@ -129,7 +129,7 @@ class TableField(object):
 class UnicodeTableField(TableField):
 
     def valid(self):
-        return self.field == "__unicode__" or self.field == "__str__"
+        return self.field == "__str__" or self.field == "__str__"
 
     def header(self):
         try:
@@ -185,8 +185,20 @@ class ModelTableField(CallableTableField):
         if isinstance(self.field, six.string_types):
             field = self.view.model
             for subfield in self.field.split("__"):
-                item = getattr(field, subfield, None)
-                item = item.get_queryset().model
+                # print('subfield', field, subfield)
+                # a = field._meta
+
+                item = None
+
+                try:
+                    item = field._meta.get_field(subfield)
+                    # a = item
+                    # print(a, type(a), dir(a))
+                    if hasattr(item, 'get_queryset'):
+                        item = item.get_queryset().model
+                    # item = getattr(field, subfield, None)
+                except FieldDoesNotExist:
+                    pass
 
                 if not item:
                     try:
@@ -232,7 +244,7 @@ class ModelTableField(CallableTableField):
 
 class TableMixin(SortMixin):
     """ causes views with a list to have enough context to make a table """
-    list_display = ["__unicode__"]
+    list_display = ["__str__"]
     list_display_links = []
     list_editable = None  # NOT Implemented
     list_detail_link = ""
