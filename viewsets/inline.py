@@ -3,7 +3,7 @@ from django.views.generic.edit import CreateView
 from django.forms.models import modelform_factory, inlineformset_factory, \
     BaseInlineFormSet, ModelForm, _get_foreign_key, modelformset_factory
 from django.template.loader import render_to_string
-from django.contrib.contenttypes.generic import generic_inlineformset_factory
+from django.contrib.contenttypes.forms import generic_inlineformset_factory
 from django.shortcuts import redirect
 from django.utils.translation import ugettext_lazy as _
 

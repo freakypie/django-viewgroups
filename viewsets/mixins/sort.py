@@ -2,8 +2,6 @@ from __future__ import print_function
 
 import six
 from django.db.models.fields import FieldDoesNotExist
-from django.db.models.fields.related import \
-    ReverseSingleRelatedObjectDescriptor
 from django.urls import reverse
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.html import escape
@@ -188,12 +186,7 @@ class ModelTableField(CallableTableField):
             field = self.view.model
             for subfield in self.field.split("__"):
                 item = getattr(field, subfield, None)
-
-                if isinstance(item, ReverseSingleRelatedObjectDescriptor):
-                    try:
-                        item = item.get_queryset().model
-                    except AttributeError:
-                        item = item.get_query_set().model
+                item = item.get_queryset().model
 
                 if not item:
                     try:

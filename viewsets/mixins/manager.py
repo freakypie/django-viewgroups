@@ -1,8 +1,9 @@
-from copy import deepcopy
-from django.urls import reverse
-from ..views import SearchMixin
 import os
+from copy import deepcopy
 
+from django.urls import reverse
+
+from ..mixins.search import SearchMixin
 from .filter import FilterMixin
 from .sort import SortMixin, TableMixin
 
