@@ -168,7 +168,7 @@ class FilterMixin(SessionDataMixin):
                         # the type of the given field.
                         field, field_list_filter_class = list_filter, FieldListFilter.create
                     if not isinstance(field, models.Field):
-                        from django.contrib.admin.util import get_fields_from_path
+                        from django.contrib.admin.utils import get_fields_from_path
                         field_path = field
                         field = get_fields_from_path(self.model, field_path)[-1]
                     spec = field_list_filter_class(field, request, lookup_params,
