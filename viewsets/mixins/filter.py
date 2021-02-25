@@ -57,7 +57,7 @@ class GenericQuerysetListFilter(ListFilter):
             .distinct()\
             .values(self.ct_field, self.fk_field)\
             .order_by(self.ct_field)
-        retval = groupby(sorted(qs), key=itemgetter(self.ct_field))
+        retval = groupby(qs, key=lambda a: a[self.ct_field])
         return retval
 
     def get_choice_label(self, obj):
