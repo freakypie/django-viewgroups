@@ -1,6 +1,8 @@
 from __future__ import print_function
 
 import six
+from django.db import models
+from django.db.models.base import ModelBase
 from django.db.models.fields import FieldDoesNotExist
 from django.urls import reverse
 from django.utils.encoding import python_2_unicode_compatible
@@ -185,28 +187,28 @@ class ModelTableField(CallableTableField):
         if isinstance(self.field, six.string_types):
             field = self.view.model
             for subfield in self.field.split("__"):
-                # print('subfield', field, subfield)
-                # a = field._meta
-
                 item = None
 
-                try:
+                if isinstance(field, ModelBase):
                     item = field._meta.get_field(subfield)
-                    # a = item
-                    # print(a, type(a), dir(a))
-                    if hasattr(item, 'get_queryset'):
-                        item = item.get_queryset().model
-                    # item = getattr(field, subfield, None)
-                except FieldDoesNotExist:
-                    pass
 
-                if not item:
-                    try:
-                        # if its a field, then get it's verbose name
-                        item = field._meta.get_field(subfield).verbose_name
-                        self.is_model_field = True
-                    except FieldDoesNotExist:
-                        pass
+                    if getattr(item, 'related_model', None):
+                        item = item.related_model
+
+                    else:
+                        try:
+                            if hasattr(item, 'get_queryset'):
+                                item = item.get_queryset().model
+                        except (Exception, FieldDoesNotExist):
+                            pass
+
+                        if not item:
+                            try:
+                                # if its a field, then get it's verbose name
+                                item = field._meta.get_field(subfield).verbose_name
+                                self.is_model_field = True
+                            except (AttributeError, FieldDoesNotExist):
+                                pass
 
                 field = item
 
