@@ -185,56 +185,34 @@ class ModelTableField(CallableTableField):
 
     def valid(self):
         if isinstance(self.field, six.string_types):
+            field = self.view.model
+            for subfield in self.field.split("__"):
+                item = None
 
-            method_attr = getattr(self.view, self.field, None)
-            if method_attr:
-                print('view field', self.view, self.field)
-                if method_attr:
-                    field = property(method_attr)
-                else:
-                    field = method_attr
-            else:
-                field = self.view.model
-                for subfield in self.field.split("__"):
-                    item = None
+                if isinstance(field, ModelBase):
+                    try:
+                        item = field._meta.get_field(subfield)
 
-                    if isinstance(field, ModelBase):
-                        try:
-                            item = field._meta.get_field(subfield)
+                        if getattr(item, 'target_field', None):
+                            item = item.target_field.model._meta
 
-                            if getattr(item, 'related_model', None):
-                                item = item.related_model
+                        elif getattr(item, 'related_model', None):
+                            item = item.related_model
 
-                            if not item:
-                                try:
-                                    if hasattr(item, 'get_queryset'):
-                                        item = item.get_queryset().model
-                                except (Exception):
-                                    pass
+                        elif getattr(item, 'get_queryset', None):
+                            item = item.get_queryset().model
 
-                            if not item:
-                                try:
-                                    # if its a field, then get it's verbose name
-                                    item = field._meta.get_field(subfield).verbose_name
-                                    self.is_model_field = True
-                                except (AttributeError):
-                                    pass
-                        except (FieldDoesNotExist):
-                            pass
+                        else:
+                            # if its a field, then get it's verbose name
+                            # item = getattr(item, 'verbose_name', getattr(item, 'name', None))
+                            self.is_model_field = getattr(item, 'verbose_name', None)
+                    except (FieldDoesNotExist):
+                        item = None
 
-                        # model attr
-                        if not item:
-                            model_attr = getattr(item, subfield, None)
-                            if model_attr:
-                                if callable(model_attr):
-                                    item = property(model_attr)
-                                else:
-                                    item = model_attr
+                field = item
 
-                    field = item
-
-                    if not field:
-                        break
+                if not field:
+                    break
 
             self.attr = field
 
@@ -242,9 +220,11 @@ class ModelTableField(CallableTableField):
         return False
 
     def header(self):
-        return getattr(self.attr, "short_description", None) or \
+        retval = getattr(self.attr, "short_description", None) or \
+            getattr(self.attr, "verbose_name", None) or \
             getattr(self.attr, "name", None) or \
             self.field.title()
+        return retval
 
     def sort(self):
         if self.is_model_field:
@@ -341,7 +321,6 @@ class TableMixin(SortMixin):
             try:
                 retval = field.value(obj)
             except Exception as ex:
-                print (type(ex), ex)
                 retval = mark_safe(u"<i style='color:darkred;' " + \
                     u"class='glyphicon glyphicon-exclamation-sign' " + \
                     u"title='{}: {}'></i>".format(type(ex).__name__, escape(str(ex))))
