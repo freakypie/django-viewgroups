@@ -103,6 +103,9 @@ class ActionListView(ActionMixin, ListView):
 class AdminListView(FilterMixin, SearchMixin, TableMixin, ActionListView):
     paginate_by = 25
 
+    def get_empty_value_display(self):
+        return '----'
+
 
 class MultipleFormsMixin(object):
     """ processes multiple forms by key """
