@@ -30,7 +30,7 @@ class ActionMixin(object):
         return render(request, self.delete_selected_template, {
             "selected_name": self.selected_name,
             "action_name": self.action_name,
-            "action": request.REQUEST.get(self.action_name),
+            "action": request.POST.get(self.action_name),
             "queryset": queryset,
             "opts": queryset.model._meta
         })

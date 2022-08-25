@@ -8,7 +8,7 @@ register = template.Library()
 
 @register.simple_tag
 def paginate(request, queryset, per_page=25, page_var="page"):
-    page = request.REQUEST.get(page_var, 1)
+    page = request.GET.get(page_var, 1)
     try:
         return Paginator(queryset, per_page).page(page)
     except InvalidPage:

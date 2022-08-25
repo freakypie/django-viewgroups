@@ -55,7 +55,7 @@ class SearchMixin(SessionDataMixin):
         return self.get_searched_queryset(queryset)
 
     def is_empty_search(self):
-        return not self.request.REQUEST.get(self.search_term, None)
+        return not self.request.GET.get(self.search_term, None)
 
     def get_context_data(self, **kwargs):
         query = getattr(self, "query", "")
